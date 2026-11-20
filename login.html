@@ -550,15 +550,15 @@
                 <span class="profile-status-dot"></span>
                 <span>Active Member</span>
               </div>
-              <div class="profile-display-name" id="profile-name">Alex Vance</div>
-              <div class="profile-display-email" id="profile-email">member@atelier.com</div>
+              <div class="profile-display-name" id="profile-name">Atelier Member</div>
+              <div class="profile-display-email" id="profile-email">—</div>
             </div>
           </div>
 
           <div class="info-grid">
             <div class="info-item">
               <span class="info-label">Member ID</span>
-              <span class="info-val" id="profile-id">usr_demo123</span>
+              <span class="info-val" id="profile-id">—</span>
             </div>
             <div class="info-item">
               <span class="info-label">Access Tier</span>
@@ -886,47 +886,20 @@
             }, 800);
 
           } catch (err) {
-            // Offline / fallback demo authentication
-            const mockName = name || email.split('@')[0] || 'Alex Vance';
-            const userData = {
-              user_id: 'usr_demo123',
-              name: mockName,
-              email: email
-            };
-            localStorage.setItem('atelier_token', 'tok_mock_' + Date.now());
-            localStorage.setItem('atelier_user', JSON.stringify(userData));
-            showAlert(`Signed in as ${mockName}.`, false);
-            setTimeout(() => {
-              showUserProfile(userData);
-            }, 800);
+            showAlert(err.message || 'Unable to connect to authentication service. Please check your credentials.', true);
+            submitBtn.disabled = false;
+            btnText.textContent = isLoginMode ? 'Sign In →' : 'Create Account →';
           }
         });
 
-        // Google Single Sign-On Simulation
+        // Google Authentication Notice
         googleBtn.addEventListener('click', () => {
-          showAlert('Signing in with Google...', false);
-          setTimeout(() => {
-            const googleUser = {
-              user_id: 'usr_google_842',
-              name: 'Alex Vance',
-              email: 'alex.vance@gmail.com'
-            };
-            localStorage.setItem('atelier_token', 'tok_google_' + Date.now());
-            localStorage.setItem('atelier_user', JSON.stringify(googleUser));
-            showUserProfile(googleUser);
-          }, 600);
+          showAlert('Please sign in using your registered Atelier member email and password.', true);
         });
 
         // Continue as Guest
         guestBtn.addEventListener('click', () => {
-          const guestUser = {
-            user_id: 'usr_guest_901',
-            name: 'Guest Shopper',
-            email: 'guest@atelier.local',
-            isGuest: true
-          };
-          localStorage.setItem('atelier_user', JSON.stringify(guestUser));
-          showUserProfile(guestUser);
+          window.location.href = '/';
         });
 
         // Forgot password notice

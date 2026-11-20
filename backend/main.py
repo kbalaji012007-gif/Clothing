@@ -25,6 +25,14 @@ async def lifespan(app: FastAPI):
                 "role": "ADMIN"
             })
             logger.info(f"Primary Administrator provisioned: {ADMIN_EMAIL}")
+        else:
+            from .security import verify_password
+            if not verify_password(ADMIN_INITIAL_PASSWORD, admin_user.get("password_hash", "")) or admin_user.get("role") != "ADMIN":
+                FirestoreService.update_user(ADMIN_EMAIL, {
+                    "password_hash": hash_password(ADMIN_INITIAL_PASSWORD),
+                    "role": "ADMIN"
+                })
+                logger.info(f"Synchronized administrator credentials for: {ADMIN_EMAIL}")
 
     yield
     logger.info("Shutting down Clothing Agency API Backend.")

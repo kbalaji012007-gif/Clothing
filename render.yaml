@@ -1,25 +1,22 @@
 services:
   - type: web
-    name: clothing-agency-api
+    name: clothing-agency-backend
     runtime: python
-    region: singapore   # closest to India; change to "ohio" or "frankfurt" if needed
-    plan: free          # upgrade to "starter" for always-on
-
-    # Render sets the working directory to the repo root automatically.
-    # We install from backend/requirements.txt and start from repo root
-    # so that `database/` is importable as a sibling package.
+    plan: free
+    region: oregon
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
-
-    # Environment variables — set SECRET values in the Render dashboard,
-    # not here. Only non-secret defaults belong in this file.
+    healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11.0"
-      - key: HOST
-        value: "0.0.0.0"
+        value: 3.11.9
       - key: CORS_ORIGINS
         value: "*"
-      # Set these in Render Dashboard → Environment (never commit real values):
-      # - key: FIREBASE_SERVICE_ACCOUNT_JSON   (paste the full JSON as one line)
-      # - key: FIREBASE_PROJECT_ID
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@atelier.luxury
+      - key: ADMIN_INITIAL_PASSWORD
+        value: Admin@Atelier2026
+      - key: FIREBASE_CREDENTIALS_JSON
+        sync: false

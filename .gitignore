@@ -19,6 +19,8 @@ env/
 
 # Firebase / Google credentials — NEVER commit secrets
 serviceAccountKey.json
+*serviceAccountKey.json
+*key.json
 firebase-adminsdk*.json
 google-credentials.json
 *-credentials.json
