@@ -22,7 +22,7 @@ def init_firebase():
     from firebase_admin import credentials, firestore
 
     # 1. Environment variable JSON string (for Render / Railway / Cloud)
-    cred_json_str = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    cred_json_str = os.getenv("FIREBASE_CREDENTIALS_JSON") or os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
     if cred_json_str:
         try:
             cred_dict = json.loads(cred_json_str)
