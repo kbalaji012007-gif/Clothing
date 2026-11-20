@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Order Management Engine — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link active"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Order Fulfillment & Logistics Engine</div>
+        <div class="topbar-actions">
+          <button onclick="loadAdminOrders()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh Orders
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div class="admin-panel">
+          <!-- Filters & Search Bar -->
+          <div class="panel-header">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; width: 100%;">
+              <input type="text" id="order-search-input" class="filter-input" style="min-width: 280px; flex: 1;" placeholder="Search by Order ID, customer name, email, or UTR..." />
+
+              <select id="status-filter" class="filter-input">
+                <option value="">All Statuses</option>
+                <option value="PAYMENT_PENDING">Payment Pending</option>
+                <option value="PAYMENT_UNDER_REVIEW">Payment Under Review</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="PACKED">Packed</option>
+                <option value="SHIPPED">Shipped</option>
+                <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="REFUND_REQUESTED">Refund Requested</option>
+                <option value="REFUNDED">Refunded</option>
+              </select>
+
+              <button onclick="applyFilters()" class="admin-btn admin-btn-primary admin-btn-sm">Apply Filter</button>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Information</th>
+                  <th>Items</th>
+                  <th>Payment Method & Status</th>
+                  <th>Grand Total</th>
+                  <th>Fulfillment Status</th>
+                  <th>Date Placed</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">Loading orders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Order Detail & Status Update Modal -->
+    <div id="order-detail-modal" class="admin-modal-overlay">
+      <div class="admin-modal-card">
+        <div class="modal-head">
+          <h3 id="modal-order-title">Order Details</h3>
+          <button class="close-modal-btn" onclick="closeOrderModal()">&times;</button>
+        </div>
+
+        <div id="modal-order-content">
+          <!-- Dynamic Content Injected Here -->
+        </div>
+
+        <form id="order-status-form" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--admin-border-subtle);">
+          <input type="hidden" id="edit-order-id" />
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: #fff;">Update Order Lifecycle Status</h4>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Workflow Status</label>
+              <select id="update-status-select" class="filter-input" style="width: 100%;">
+                <option value="CONFIRMED">CONFIRMED</option>
+                <option value="PROCESSING">PROCESSING</option>
+                <option value="PACKED">PACKED</option>
+                <option value="SHIPPED">SHIPPED</option>
+                <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY</option>
+                <option value="DELIVERED">DELIVERED</option>
+                <option value="CANCELLED">CANCELLED</option>
+                <option value="REFUNDED">REFUNDED</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Tracking Number / Waybill</label>
+              <input type="text" id="update-tracking-input" class="filter-input" style="width: 100%;" placeholder="e.g. AWB-98234-IN" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Internal Administrative Notes</label>
+            <input type="text" id="update-notes-input" class="filter-input" style="width: 100%;" placeholder="e.g. Courier handed to BlueDart express flight" />
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="closeOrderModal()">Cancel</button>
+            <button type="submit" class="admin-btn admin-btn-gold admin-btn-sm">Update Status & Commit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      let allOrders = [];
+
+      async function loadAdminOrders(status = '', search = '') {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const tbody = document.getElementById('orders-table-body');
+        try {
+          let url = '/admin/orders?limit=200';
+          if (status) url += `&status=${encodeURIComponent(status)}`;
+          if (search) url += `&search=${encodeURIComponent(search)}`;
+
+          allOrders = await AdminApp.apiRequest(url);
+
+          if (allOrders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">No orders matched the filter criteria.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = allOrders.map(o => {
+            const dateStr = new Date(o.created_at).toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const pillClass = `pill-${o.status.toLowerCase()}`;
+            return `
+              <tr>
+                <td style="font-family: monospace; font-weight: 700; color: #fff;">${o.id}</td>
+                <td>
+                  <div style="font-weight: 600; color: #fff;">${o.customer_name}</div>
+                  <div style="font-size: 11px; color: var(--admin-text-muted);">${o.customer_email}</div>
+                  <div style="font-size: 10px; color: var(--admin-text-dim);">${o.shipping_address || ''}</div>
+                </td>
+                <td>
+                  <div style="font-size: 12px; font-weight: 600;">${o.items.length} item${o.items.length === 1 ? '' : 's'}</div>
+                  <div style="font-size: 11px; color: var(--admin-text-muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${o.items.map(i => i.title).join(', ')}
+                  </div>
+                </td>
+                <td>
+                  <div style="font-size: 12px;">${o.payment_method}</div>
+                  <div style="font-size: 11px; color: ${o.payment_status === 'VERIFIED' ? 'var(--admin-success)' : 'var(--admin-warning)'}; font-weight: 600;">
+                    ${o.payment_status || 'CONFIRMED'}
+                  </div>
+                </td>
+                <td style="font-weight: 700; color: #fff;">$${Number(o.total).toFixed(2)}</td>
+                <td><span class="status-pill ${pillClass}">${o.status}</span></td>
+                <td style="color: var(--admin-text-muted); font-size: 12px;">${dateStr}</td>
+                <td>
+                  <button class="admin-btn admin-btn-secondary admin-btn-sm" onclick="openOrderModal('${o.id}')">
+                    Inspect & Fulfill
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          // Auto-open order if query param present
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetId = urlParams.get('id');
+          if (targetId) {
+            openOrderModal(targetId);
+          }
+
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="8" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load orders: ${err.message}</td></tr>`;
+        }
+      }
+
+      function applyFilters() {
+        const search = document.getElementById('order-search-input').value.trim();
+        const status = document.getElementById('status-filter').value;
+        loadAdminOrders(status, search);
+      }
+
+      document.getElementById('order-search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
+      });
+
+      function openOrderModal(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        document.getElementById('modal-order-title').textContent = `Order Details — ${order.id}`;
+        document.getElementById('edit-order-id').value = order.id;
+        document.getElementById('update-status-select').value = order.status.toUpperCase();
+        document.getElementById('update-tracking-input').value = order.tracking_number || '';
+        document.getElementById('update-notes-input').value = order.admin_notes || '';
+
+        const content = document.getElementById('modal-order-content');
+        content.innerHTML = `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: var(--admin-bg-base); padding: 16px; border-radius: var(--admin-radius-sm); margin-bottom: 16px; font-size: 13px;">
+            <div>
+              <strong style="color: var(--admin-text-muted); font-size: 11px; text-transform: uppercase;">Customer</strong>
+              <div style="font-weight: 600; color: #fff;">${order.customer_name}</div>
+              <div style="color: var(--admin-text-muted);">${order.customer_email}</div>
+            </div>
+            <div>
+              <strong style="color: var(--admin-text-muted); font-size: 11px; text-transform: uppercase;">Shipping Address</strong>
+              <div style="color: #fff;">${order.shipping_address}</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <strong style="display: block; font-size: 12px; text-transform: uppercase; color: var(--admin-text-muted); margin-bottom: 8px;">Order Line Items</strong>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              ${order.items.map(i => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--admin-bg-base); border-radius: 4px;">
+                  <div>
+                    <strong style="color: #fff;">${i.title}</strong>
+                    <div style="font-size: 11px; color: var(--admin-text-muted);">Size: ${i.size} · Qty: ${i.quantity}</div>
+                  </div>
+                  <div style="font-weight: 600; color: #fff;">
+                    $${(Number(i.price) * Number(i.quantity)).toFixed(2)}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #22222a; border-radius: 6px; font-size: 14px; font-weight: 700; color: #fff;">
+            <span>Grand Total Paid:</span>
+            <span>$${Number(order.total).toFixed(2)} (₹${(Number(order.total) * 86.5).toLocaleString('en-IN', { minimumFractionDigits: 2 })} INR)</span>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <a href="/api/orders/${order.id}/invoice/html" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm" style="width: 100%; justify-content: center;">
+              📄 Open Official Printable Tax Invoice HTML
+            </a>
+          </div>
+        `;
+
+        document.getElementById('order-detail-modal').style.display = 'flex';
+      }
+
+      function closeOrderModal() {
+        document.getElementById('order-detail-modal').style.display = 'none';
+      }
+
+      document.getElementById('order-status-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const orderId = document.getElementById('edit-order-id').value;
+        const status = document.getElementById('update-status-select').value;
+        const tracking = document.getElementById('update-tracking-input').value.trim();
+        const notes = document.getElementById('update-notes-input').value.trim();
+
+        try {
+          await AdminApp.apiRequest(`/admin/orders/${orderId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              status: status,
+              tracking_number: tracking,
+              notes: notes
+            })
+          });
+
+          AdminApp.showToast(`Order ${orderId} updated to ${status}.`);
+          closeOrderModal();
+          loadAdminOrders();
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      });
+
+      window.onload = () => loadAdminOrders();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Customer Dashboard — Atelier</title>
+    <link rel="stylesheet" href="/account/account.css" />
+  </head>
+  <body>
+    <!-- Top Header -->
+    <header class="account-header">
+      <div class="brand-wrap">
+        <a href="/" class="brand-title">ATELIER</a>
+        <span class="portal-tag">Customer Portal</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/">Storefront</a>
+        <a href="/account/orders.html">Orders</a>
+        <a href="/account/wishlist.html">Wishlist</a>
+        <a href="/account/profile.html">Profile</a>
+        <a href="/" class="btn-storefront">🛍 Return to Bag</a>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="account-container">
+      <div class="account-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="account-sidebar">
+          <div class="user-badge">
+            <div id="user-sidebar-avatar" class="user-avatar">AV</div>
+            <div class="user-info">
+              <h4 id="user-sidebar-name">Loading...</h4>
+              <p id="user-sidebar-email">...</p>
+            </div>
+          </div>
+          <ul class="sidebar-menu">
+            <li><a href="/account/dashboard.html" class="sidebar-link active"><span>📊</span> Dashboard</a></li>
+            <li><a href="/account/orders.html" class="sidebar-link"><span>📦</span> Purchases & Tracking</a></li>
+            <li><a href="/account/profile.html" class="sidebar-link"><span>👤</span> Profile & Sizing</a></li>
+            <li><a href="/account/wishlist.html" class="sidebar-link"><span>❤️</span> Saved Wishlist</a></li>
+            <li><a href="/" class="sidebar-link"><span>✨</span> Shop Collections</a></li>
+            <li><a href="#" id="btn-logout" class="sidebar-link logout"><span>🚪</span> Sign Out</a></li>
+          </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="account-content">
+          <!-- Welcome Banner -->
+          <div class="content-card" style="background: linear-gradient(135deg, #111 0%, #222 100%); color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7;">Client Privilege Status</span>
+                <h2 id="welcome-heading" style="font-size: 24px; font-weight: 700; margin-top: 4px;">Welcome back</h2>
+                <p style="font-size: 13px; opacity: 0.8; margin-top: 4px;">Manage deliveries, inspect invoices, and track your high-fashion pieces.</p>
+              </div>
+              <div>
+                <span class="status-badge" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; font-size: 12px;">
+                  ★ Atelier VIP Member
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metric Cards Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="content-card" style="padding: 20px;">
+              <span style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600;">Total Orders</span>
+              <div id="stat-total-orders" style="font-size: 28px; font-weight: 800; margin-top: 4px;">0</div>
+              <span style="font-size: 12px; color: var(--success); font-weight: 500;">Direct from Atelier</span>
+            </div>
+
+            <div class="content-card" style="padding: 20px;">
+              <span style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600;">Active Deliveries</span>
+              <div id="stat-active-orders" style="font-size: 28px; font-weight: 800; margin-top: 4px; color: #1e40af;">0</div>
+              <span style="font-size: 12px; color: var(--text-secondary);">In transit or review</span>
+            </div>
+
+            <div class="content-card" style="padding: 20px;">
+              <span style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600;">Saved in Wishlist</span>
+              <div id="stat-wishlist-count" style="font-size: 28px; font-weight: 800; margin-top: 4px; color: #9d174d;">0</div>
+              <span style="font-size: 12px; color: var(--text-secondary);">Curated pieces</span>
+            </div>
+          </div>
+
+          <!-- Recent Purchases -->
+          <div class="content-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 class="card-title">Recent Purchases</h3>
+                <p class="card-desc" style="margin-bottom: 0;">Your latest footwear and couture orders.</p>
+              </div>
+              <a href="/account/orders.html" class="btn btn-secondary btn-sm">View All Orders →</a>
+            </div>
+
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-orders-tbody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px;">Loading purchases...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/account/account.js"></script>
+    <script>
+      (async function() {
+        if (!AccountApp.requireAuth()) return;
+        AccountApp.initSidebar();
+
+        const user = AccountApp.getUser();
+        if (user) {
+          const heading = document.getElementById('welcome-heading');
+          if (heading) heading.textContent = `Welcome back, ${user.name.split(' ')[0]}`;
+        }
+
+        try {
+          const orders = await AccountApp.apiRequest('/orders/my-orders');
+          const wishlistData = await AccountApp.apiRequest('/auth/wishlist').catch(() => ({ product_ids: [] }));
+
+          document.getElementById('stat-total-orders').textContent = orders.length;
+          const activeCount = orders.filter(o => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status.toUpperCase())).length;
+          document.getElementById('stat-active-orders').textContent = activeCount;
+          document.getElementById('stat-wishlist-count').textContent = (wishlistData.product_ids || []).length;
+
+          const tbody = document.getElementById('recent-orders-tbody');
+          if (orders.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 36px;">
+                  No previous orders found. <a href="/" style="font-weight: 600; text-decoration: underline;">Browse the Runway Collection</a>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          tbody.innerHTML = orders.slice(0, 5).map(o => {
+            const dateStr = new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const statusClass = `status-${o.status.toLowerCase()}`;
+            return `
+              <tr>
+                <td style="font-weight: 700; font-family: monospace;">${o.id}</td>
+                <td style="color: var(--text-secondary);">${dateStr}</td>
+                <td>${o.items.length} piece${o.items.length === 1 ? '' : 's'}</td>
+                <td style="font-weight: 600;">$${Number(o.total).toFixed(2)}</td>
+                <td><span class="status-badge ${statusClass}">${o.status}</span></td>
+                <td>
+                  <a href="/account/orders.html?id=${o.id}" class="btn btn-secondary btn-sm">Inspect & Track</a>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        }
+      })();
+    </script>
+  </body>
+</html>

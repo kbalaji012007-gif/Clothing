@@ -13,8 +13,8 @@
     {
       id: 'luka-5',
       name: 'LUKA 5',
-      price: '$149.00',
-      numericPrice: 149,
+      price: '₹4,999',
+      numericPrice: 4999,
       image: '/assets/sneakers/sneaker-1.webp',
       bgColor: '#DCE8F5'
     },
@@ -217,6 +217,7 @@
             productId: shoe.id,
             name: shoe.name,
             price: shoe.numericPrice || 149,
+            formattedPrice: shoe.price,
             size: String(selectedSize || '42'),
             image: shoe.image,
             quantity: 1
@@ -678,6 +679,7 @@
               productId: activeModalProduct.id,
               name: activeModalProduct.title,
               price: activeModalProduct.numericPrice || 199,
+              formattedPrice: activeModalProduct.price,
               size: chosenSize,
               image: activeModalProduct.frontImage || activeModalProduct.sideImage,
               quantity: 1
@@ -1253,6 +1255,7 @@
               productId: item.id,
               name: item.name,
               price: item.numericPrice || 149,
+              formattedPrice: item.price,
               size: 'M',
               image: item.image,
               quantity: 1
@@ -1380,6 +1383,153 @@
     });
   }
 
+  // --------------------------------------------------------------------------
+  // 5. AUTHORITATIVE PRODUCT CATALOG & PRICE SYNCHRONIZATION
+  // --------------------------------------------------------------------------
+  async function syncStorefrontProducts() {
+    try {
+      const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://127.0.0.1:8001/api'
+        : '/api';
+
+      const res = await fetch(`${apiBase}/products?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) return;
+      const products = await res.json();
+      if (!Array.isArray(products) || products.length === 0) return;
+
+      const prodMap = new Map();
+      products.forEach((p) => {
+        prodMap.set(p.id, p);
+      });
+
+      // 1. Sync SNEAKERS array
+      SNEAKERS.forEach((shoe) => {
+        const p = prodMap.get(shoe.id);
+        if (p) {
+          if (p.price) shoe.price = p.price;
+          if (p.numericPrice !== undefined) shoe.numericPrice = Number(p.numericPrice);
+          if (p.title) shoe.name = p.title;
+          if (p.bgColor) shoe.bgColor = p.bgColor;
+        }
+      });
+
+      // 2. Sync active shoe DOM in Sneaker Orbit
+      const orbitPriceEl = document.getElementById('orbit-price');
+      if (orbitPriceEl) {
+        const counterEl = document.getElementById('orbit-counter');
+        let activeIdx = 0;
+        if (counterEl && counterEl.textContent) {
+          const match = counterEl.textContent.match(/(\d+)\s*\/\s*07/);
+          if (match) activeIdx = Math.max(0, parseInt(match[1], 10) - 1);
+        }
+        if (SNEAKERS[activeIdx]) {
+          orbitPriceEl.textContent = SNEAKERS[activeIdx].price;
+        }
+      }
+
+      // 3. Sync RACK_PRODUCTS & DOM
+      if (typeof RACK_PRODUCTS !== 'undefined' && Array.isArray(RACK_PRODUCTS)) {
+        RACK_PRODUCTS.forEach((item) => {
+          const p = prodMap.get(item.id);
+          if (p) {
+            if (p.price) {
+              item.price = p.price;
+              item.tag = p.price;
+            }
+            if (p.numericPrice !== undefined) item.numericPrice = Number(p.numericPrice);
+            if (p.title) item.title = p.title;
+          }
+        });
+
+        document.querySelectorAll('.rack-hanger-item').forEach((el, idx) => {
+          if (RACK_PRODUCTS[idx]) {
+            const tag = el.querySelector('.rack-tag-text');
+            if (tag) tag.textContent = RACK_PRODUCTS[idx].tag || RACK_PRODUCTS[idx].price;
+            el.setAttribute('aria-label', `${RACK_PRODUCTS[idx].title} - ${RACK_PRODUCTS[idx].price}`);
+          }
+        });
+
+        const activeRackPrice = document.getElementById('rack-active-price');
+        const activeRackTitle = document.getElementById('rack-active-title');
+        if (activeRackPrice && activeRackTitle) {
+          const match = RACK_PRODUCTS.find(p => p.title === activeRackTitle.textContent.trim());
+          if (match) activeRackPrice.textContent = match.price;
+        }
+
+        const modalPrice = document.getElementById('rack-modal-price');
+        const modalTitle = document.getElementById('rack-modal-title');
+        if (modalPrice && modalTitle) {
+          const match = RACK_PRODUCTS.find(p => p.title === modalTitle.textContent.trim());
+          if (match) modalPrice.textContent = match.price;
+        }
+      }
+
+      // 4. Sync SEARCH_CATALOG
+      if (typeof SEARCH_CATALOG !== 'undefined' && Array.isArray(SEARCH_CATALOG)) {
+        SEARCH_CATALOG.forEach((item) => {
+          const p = prodMap.get(item.id);
+          if (p) {
+            if (p.price) item.price = p.price;
+            if (p.numericPrice !== undefined) item.numericPrice = Number(p.numericPrice);
+            if (p.title) {
+              item.name = p.title;
+              item.title = p.title;
+            }
+          }
+        });
+
+        // Append any new products created in admin dashboard
+        products.forEach((p) => {
+          if (!SEARCH_CATALOG.some((c) => c.id === p.id)) {
+            SEARCH_CATALOG.push({
+              id: p.id,
+              name: p.title || p.name,
+              title: p.title || p.name,
+              category: p.category || 'Product',
+              price: p.price,
+              numericPrice: Number(p.numericPrice) || 0,
+              image: p.image || p.frontImage || '/assets/sneakers/sneaker-1.webp',
+              type: p.category || 'product',
+              desc: p.desc || ''
+            });
+          }
+        });
+      }
+
+      // 5. Update Lookbook items in DOM
+      products.forEach((p) => {
+        document.querySelectorAll(`[data-product-id="${p.id}"] .item-price, [data-product-price-id="${p.id}"]`).forEach((el) => {
+          el.textContent = p.price;
+        });
+      });
+
+      // 6. Refresh bag items if customer cart has stale prices
+      if (typeof window.refreshBagPrices === 'function') {
+        window.refreshBagPrices(prodMap);
+      }
+    } catch (err) {
+      console.warn('Error synchronizing catalog products:', err);
+    }
+  }
+
+  window.syncStorefrontProducts = syncStorefrontProducts;
+
+  // Real-time catalog sync when updated in another tab
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'atelier_catalog_updated_at') {
+      syncStorefrontProducts();
+    }
+  });
+  window.addEventListener('atelier-product-updated', () => {
+    syncStorefrontProducts();
+  });
+  window.addEventListener('focus', () => {
+    syncStorefrontProducts();
+  });
+
   // Run on DOM load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -1387,11 +1537,13 @@
       initRail();
       initNav();
       initSearch();
+      syncStorefrontProducts();
     });
   } else {
     initOrbit();
     initRail();
     initNav();
     initSearch();
+    syncStorefrontProducts();
   }
 })();

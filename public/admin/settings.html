@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>System Settings & Audit Logs — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link active"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Platform Configuration & Compliance Audit</div>
+        <div class="topbar-actions">
+          <button onclick="loadSettings()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+          <!-- Gateway & Currency Settings -->
+          <div class="admin-panel">
+            <h3 class="panel-title" style="margin-bottom: 4px;">Payment Gateway & Invoicing</h3>
+            <p class="panel-desc" style="margin-bottom: 16px;">Active YouPI-PG parameters and corporate tax identities.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Payee Virtual Payment Address (VPA):</span>
+                <strong style="color: #fff; font-family: monospace;">atelier@upi</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Commercial Payee Name:</span>
+                <strong style="color: #fff;">Atelier Collection</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Fixed USD/INR Conversion Rate:</span>
+                <strong style="color: var(--admin-accent-gold);">₹86.50 INR / USD</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Goods & Services Tax (GST):</span>
+                <strong style="color: #fff;">18% (Inclusive CGST 9% + SGST 9%)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">GSTIN / Corporate Entity:</span>
+                <strong style="color: #fff; font-family: monospace;">07AABCA1234F1Z5</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Architecture Status -->
+          <div class="admin-panel">
+            <h3 class="panel-title" style="margin-bottom: 4px;">Security & Token Specifications</h3>
+            <p class="panel-desc" style="margin-bottom: 16px;">Cryptographic algorithms and access control configuration.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Password Hashing Algorithm:</span>
+                <strong style="color: var(--admin-success);">Argon2id (OWASP Tier-1)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Token Specification:</span>
+                <strong style="color: #fff;">Signed JWT (HMAC-SHA256)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Token Expiration TTL:</span>
+                <strong style="color: #fff;">7 Days (10,080 minutes)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Role-Based Verification:</span>
+                <strong style="color: var(--admin-accent-gold);">ADMIN & CUSTOMER (Strict RBAC)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--admin-border-subtle);">
+                <span style="color: var(--admin-text-muted);">Cross-Customer Isolation:</span>
+                <strong style="color: var(--admin-success);">Enforced (403 Forbidden)</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Activity Audit Log -->
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Complete Administrative Audit Log</h3>
+              <p class="panel-desc">Chronological register of executive actions, status updates, and security events.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Event ID</th>
+                  <th>Action Executed</th>
+                  <th>Administrator</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="logs-tbody">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--admin-text-muted); padding: 28px;">Loading audit logs...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      async function loadSettings() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const tbody = document.getElementById('logs-tbody');
+        try {
+          const logs = await AdminApp.apiRequest('/admin/logs?limit=50');
+
+          if (logs.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--admin-text-muted); padding: 24px;">No security logs recorded yet.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = logs.map(l => {
+            const timeStr = new Date(l.timestamp).toLocaleString();
+            return `
+              <tr>
+                <td style="font-family: monospace; color: var(--admin-accent-gold); font-weight: 600;">${l.log_id}</td>
+                <td style="color: #fff; font-weight: 600;">${l.action}</td>
+                <td style="color: var(--admin-text-muted); font-size: 12px;">${l.admin_email}</td>
+                <td style="color: var(--admin-text-dim); font-size: 12px;">${timeStr}</td>
+              </tr>
+            `;
+          }).join('');
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="4" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load logs: ${err.message}</td></tr>`;
+        }
+      }
+
+      window.onload = loadSettings;
+    </script>
+  </body>
+</html>

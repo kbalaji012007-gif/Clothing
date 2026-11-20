@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Create Customer Account — Atelier</title>
+    <link rel="stylesheet" href="/account/account.css" />
+    <style>
+      .auth-wrap {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: var(--bg-secondary);
+      }
+      .auth-box {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: var(--shadow-md);
+      }
+      .auth-title {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+      .auth-sub {
+        font-size: 13px;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .auth-alert {
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .auth-alert.error {
+        display: block;
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid #fecaca;
+      }
+      .auth-footer {
+        margin-top: 24px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+      .auth-footer a {
+        font-weight: 600;
+        color: var(--text-primary);
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-wrap">
+      <div class="auth-box">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <a href="/" style="font-size: 14px; font-weight: 800; letter-spacing: 2px;">ATELIER LUXURY</a>
+        </div>
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-sub">Join Atelier to track orders, save personal sizing, and curate lookbooks.</p>
+
+        <div id="alert-box" class="auth-alert"></div>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input type="text" id="name" class="form-input" required placeholder="Alex Vance" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" required placeholder="you@example.com" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number (Optional)</label>
+            <input type="tel" id="phone" class="form-input" placeholder="+91 98765 43210" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password (Minimum 6 characters)</label>
+            <input type="password" id="password" class="form-input" required minlength="6" placeholder="••••••••" />
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+            Create Member Account →
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already registered? <a href="/account/login.html">Sign In</a>
+          <div style="margin-top: 14px;">
+            <a href="/" style="font-size: 12px; color: var(--text-secondary); text-decoration: none;">← Back to Storefront</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/account/account.js"></script>
+    <script>
+      (function() {
+        const form = document.getElementById('register-form');
+        const alertBox = document.getElementById('alert-box');
+        const submitBtn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          alertBox.className = 'auth-alert';
+          alertBox.style.display = 'none';
+
+          const name = document.getElementById('name').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const password = document.getElementById('password').value.trim();
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Creating account...';
+
+          try {
+            const data = await AccountApp.apiRequest('/auth/register', {
+              method: 'POST',
+              body: JSON.stringify({ name, email, phone, password })
+            });
+
+            AccountApp.setSession(data.token, {
+              user_id: data.user_id,
+              name: data.name,
+              email: data.email,
+              role: data.role
+            });
+
+            if (sessionStorage.getItem('pending_checkout') === 'true') {
+              sessionStorage.removeItem('pending_checkout');
+              window.location.href = '/?checkout=true';
+            } else {
+              window.location.href = '/account/dashboard.html';
+            }
+          } catch (err) {
+            alertBox.textContent = err.message || 'Registration failed.';
+            alertBox.className = 'auth-alert error';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Member Account →';
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

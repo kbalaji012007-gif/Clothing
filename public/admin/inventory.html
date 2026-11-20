@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Inventory & Stock Management — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link active"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Inventory Controls & Variant Stock</div>
+        <div class="topbar-actions">
+          <button onclick="loadInventory()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh Inventory
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Stock Status & Sizing Variants</h2>
+              <p class="panel-desc">Manage real availability for Sneaker Orbit, 3D Clothing Rack, and Runway pieces.</p>
+            </div>
+            <div>
+              <select id="stock-filter" class="filter-input" onchange="filterInventory()">
+                <option value="">All Items</option>
+                <option value="in_stock">In Stock Only</option>
+                <option value="out_of_stock">Out of Stock Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product Title & ID</th>
+                  <th>Category</th>
+                  <th>Price ($ USD)</th>
+                  <th>Available Sizes</th>
+                  <th>Stock Availability</th>
+                  <th>Immediate Toggle</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-tbody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">Loading inventory records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      let inventoryList = [];
+
+      async function loadInventory() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const tbody = document.getElementById('inventory-tbody');
+        try {
+          inventoryList = await AdminApp.apiRequest('/admin/products');
+          renderInventory(inventoryList);
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load inventory: ${err.message}</td></tr>`;
+        }
+      }
+
+      function renderInventory(list) {
+        const tbody = document.getElementById('inventory-tbody');
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 32px;">No products found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(item => `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #fff;">${item.title}</div>
+              <div style="font-size: 11px; color: var(--admin-text-muted); font-family: monospace;">ID: ${item.id}</div>
+            </td>
+            <td style="text-transform: uppercase; font-size: 11px; font-weight: 600;">${item.category}</td>
+            <td style="font-weight: 700; color: #fff;">$${Number(item.numericPrice).toFixed(2)}</td>
+            <td>
+              <div style="font-size: 12px; color: var(--admin-text-muted);">
+                ${(item.sizes || []).map(s => `<span style="background: var(--admin-bg-hover); padding: 2px 6px; border-radius: 3px; margin-right: 4px;">${s}</span>`).join('')}
+              </div>
+            </td>
+            <td>
+              <span class="status-pill ${item.in_stock ? 'pill-confirmed' : 'pill-failed'}">
+                ${item.in_stock ? '● In Stock' : '✕ Out of Stock'}
+              </span>
+            </td>
+            <td>
+              <button class="admin-btn admin-btn-${item.in_stock ? 'secondary' : 'primary'} admin-btn-sm" onclick="toggleStock('${item.id}', ${!item.in_stock})">
+                ${item.in_stock ? 'Mark Out of Stock' : 'Mark In Stock'}
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      function filterInventory() {
+        const val = document.getElementById('stock-filter').value;
+        if (!val) {
+          renderInventory(inventoryList);
+        } else if (val === 'in_stock') {
+          renderInventory(inventoryList.filter(i => i.in_stock));
+        } else if (val === 'out_of_stock') {
+          renderInventory(inventoryList.filter(i => !i.in_stock));
+        }
+      }
+
+      async function toggleStock(id, newStatus) {
+        try {
+          await AdminApp.apiRequest(`/admin/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ in_stock: newStatus })
+          });
+          AdminApp.showToast(`Updated stock status for ${id}.`);
+          loadInventory();
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadInventory;
+    </script>
+  </body>
+</html>

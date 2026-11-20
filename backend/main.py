@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import PORT, HOST, CORS_ORIGINS, is_firebase_connected, logger
-from .routes import products_router, cart_router, orders_router, auth_router, upi_router
+from .config import PORT, HOST, CORS_ORIGINS, is_firebase_connected, logger, ADMIN_EMAIL, ADMIN_INITIAL_PASSWORD
+from .routes import products_router, cart_router, orders_router, auth_router, upi_router, admin_router
 from .services.firestore_service import FirestoreService
+from .security import hash_password
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -11,13 +12,27 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing Clothing Agency API Backend...")
     count = FirestoreService.seed_products_if_empty()
     logger.info(f"Products initialized ({count} products loaded).")
+
+    # Bootstrap administrator if credentials provided in environment
+    if ADMIN_EMAIL and ADMIN_INITIAL_PASSWORD:
+        admin_user = FirestoreService.get_user_by_email(ADMIN_EMAIL)
+        if not admin_user:
+            FirestoreService.create_user({
+                "user_id": "adm_master_001",
+                "name": "Atelier Master Administrator",
+                "email": ADMIN_EMAIL.strip().lower(),
+                "password_hash": hash_password(ADMIN_INITIAL_PASSWORD),
+                "role": "ADMIN"
+            })
+            logger.info(f"Primary Administrator provisioned: {ADMIN_EMAIL}")
+
     yield
     logger.info("Shutting down Clothing Agency API Backend.")
 
 app = FastAPI(
     title="Clothing Agency E-Commerce API",
-    description="Python FastAPI backend with Firebase Firestore integration for Sneaker Orbit, 3D Clothing Rack, and Runway collections.",
-    version="1.0.0",
+    description="Python FastAPI backend with Dual-Portal Architecture (Customer & Admin), JWT RBAC, and Firestore integration.",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -36,6 +51,7 @@ app.include_router(cart_router, prefix="/api")
 app.include_router(orders_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(upi_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
 
 @app.get("/api/health", tags=["Health"])
 def health_check():

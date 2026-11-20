@@ -1,5 +1,9 @@
-from .product import Product, ProductCreate
+from .product import Product, ProductCreate, ProductUpdateRequest
 from .cart import CartItem, Cart, AddToCartRequest
-from .order import Order, OrderCreate, OrderItem
+from .order import Order, OrderCreate, OrderItem, OrderStatusUpdate, OrderCancellationRequest, OrderRefundRequest
 
-__all__ = ["Product", "ProductCreate", "CartItem", "Cart", "AddToCartRequest", "Order", "OrderCreate", "OrderItem"]
+__all__ = [
+    "Product", "ProductCreate", "ProductUpdateRequest",
+    "CartItem", "Cart", "AddToCartRequest",
+    "Order", "OrderCreate", "OrderItem", "OrderStatusUpdate", "OrderCancellationRequest", "OrderRefundRequest"
+]

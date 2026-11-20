@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Saved Wishlist — Atelier</title>
+    <link rel="stylesheet" href="/account/account.css" />
+    <style>
+      .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .wish-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .wish-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      .wish-img-wrap {
+        height: 200px;
+        background: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .wish-img-wrap img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+      .wish-body {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Header -->
+    <header class="account-header">
+      <div class="brand-wrap">
+        <a href="/" class="brand-title">ATELIER</a>
+        <span class="portal-tag">Customer Portal</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/">Storefront</a>
+        <a href="/account/dashboard.html">Dashboard</a>
+        <a href="/account/orders.html">Orders</a>
+        <a href="/account/profile.html">Profile</a>
+        <a href="/" class="btn-storefront">🛍 Return to Bag</a>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="account-container">
+      <div class="account-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="account-sidebar">
+          <div class="user-badge">
+            <div id="user-sidebar-avatar" class="user-avatar">AV</div>
+            <div class="user-info">
+              <h4 id="user-sidebar-name">Loading...</h4>
+              <p id="user-sidebar-email">...</p>
+            </div>
+          </div>
+          <ul class="sidebar-menu">
+            <li><a href="/account/dashboard.html" class="sidebar-link"><span>📊</span> Dashboard</a></li>
+            <li><a href="/account/orders.html" class="sidebar-link"><span>📦</span> Purchases & Tracking</a></li>
+            <li><a href="/account/profile.html" class="sidebar-link"><span>👤</span> Profile & Sizing</a></li>
+            <li><a href="/account/wishlist.html" class="sidebar-link active"><span>❤️</span> Saved Wishlist</a></li>
+            <li><a href="/" class="sidebar-link"><span>✨</span> Shop Collections</a></li>
+            <li><a href="#" id="btn-logout" class="sidebar-link logout"><span>🚪</span> Sign Out</a></li>
+          </ul>
+        </aside>
+
+        <!-- Wishlist Content -->
+        <section class="account-content">
+          <div class="content-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h2 class="card-title">Saved Wishlist Pieces</h2>
+                <p class="card-desc" style="margin-bottom: 0;">Your curated personal selection from Sneaker Orbit, 3D Clothing Rack, and Runway.</p>
+              </div>
+              <span id="wishlist-badge-count" class="status-badge" style="background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8;">
+                0 pieces
+              </span>
+            </div>
+
+            <div id="wishlist-container">
+              <div style="text-align: center; padding: 48px; color: var(--text-secondary);">Loading wishlist...</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/account/account.js"></script>
+    <script>
+      async function loadWishlist() {
+        if (!AccountApp.requireAuth()) return;
+        AccountApp.initSidebar();
+
+        const container = document.getElementById('wishlist-container');
+        try {
+          const res = await AccountApp.apiRequest('/auth/wishlist');
+          const products = res.products || [];
+          document.getElementById('wishlist-badge-count').textContent = `${products.length} piece${products.length === 1 ? '' : 's'}`;
+
+          if (products.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 48px; color: var(--text-secondary);">
+                <div style="font-size: 36px; margin-bottom: 12px;">❤️</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 6px;">Your Wishlist is Empty</h4>
+                <p style="font-size: 13px; margin-bottom: 16px;">Curate pieces directly while browsing the store.</p>
+                <a href="/" class="btn btn-primary btn-sm">Explore Collections →</a>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = `
+            <div class="wishlist-grid">
+              ${products.map(p => `
+                <div class="wish-card" id="wish-card-${p.id}">
+                  <div class="wish-img-wrap">
+                    <img src="${p.image || p.frontImage || '/assets/nike-logo.svg'}" alt="${p.title}" />
+                  </div>
+                  <div class="wish-body">
+                    <div>
+                      <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">${p.category}</span>
+                      <h4 style="font-size: 14px; font-weight: 700; margin: 4px 0;">${p.title}</h4>
+                      <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">${p.price}</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="moveToBag('${p.id}', '${p.title}', ${p.numericPrice}, '${p.image || p.frontImage}')">
+                        Move to Bag
+                      </button>
+                      <button class="btn btn-secondary btn-sm" onclick="removeFromWishlist('${p.id}')">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } catch (err) {
+          container.innerHTML = `<div style="color: var(--danger); padding: 24px;">Failed to load wishlist: ${err.message}</div>`;
+        }
+      }
+
+      function moveToBag(id, title, price, image) {
+        try {
+          const STORAGE_KEY = 'runway-styling-bag-v3';
+          const raw = localStorage.getItem(STORAGE_KEY);
+          let bag = raw ? JSON.parse(raw) : [];
+          
+          const existing = bag.find(item => item.id === id || item.productId === id);
+          if (existing) {
+            existing.quantity = (existing.quantity || 1) + 1;
+          } else {
+            bag.push({
+              id: id,
+              productId: id,
+              name: title,
+              title: title,
+              price: price,
+              quantity: 1,
+              size: 'M',
+              image: image
+            });
+          }
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(bag));
+          AccountApp.showToast(`Added ${title} to Shopping Bag.`);
+        } catch (e) {
+          AccountApp.showToast('Failed to update shopping bag.', true);
+        }
+      }
+
+      async function removeFromWishlist(productId) {
+        try {
+          await AccountApp.apiRequest(`/auth/wishlist/${productId}`, { method: 'DELETE' });
+          AccountApp.showToast('Removed from wishlist.');
+          loadWishlist();
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadWishlist;
+    </script>
+  </body>
+</html>

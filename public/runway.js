@@ -1,6 +1,10 @@
 (function () {
   'use strict';
 
+  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8001/api'
+    : '/api';
+
   const STORAGE_KEY = 'runway-styling-bag-v3';
   const ASSET_BASE = 'https://reel-ref-try-the-look.vercel.app/assets/';
 
@@ -324,11 +328,12 @@
     let totalUnits = 0;
 
     for (const entry of bagEntries) {
-      let name, price, sizeStr, image;
+      let name, price, sizeStr, image, formattedPrice;
 
       if (entry.name && entry.price !== undefined) {
         name = entry.name;
         price = Number(entry.price) || 0;
+        formattedPrice = entry.formattedPrice;
         sizeStr = entry.size ? `Size ${entry.size}` : 'Standard';
         image = entry.image || '';
       } else {
@@ -336,6 +341,7 @@
         if (!found) continue;
         name = found.item.name;
         price = Number(found.item.price) || 0;
+        formattedPrice = found.item.formattedPrice || (price >= 500 ? `₹${Math.round(price).toLocaleString('en-IN')}` : usd.format(price));
         sizeStr = `Size ${found.variant.o.join(' / ')}`;
         image = found.item.image;
       }
@@ -362,17 +368,21 @@
       h3.style.fontWeight = '600';
       h3.style.marginBottom = '4px';
 
+      const isRupee = (formattedPrice && formattedPrice.includes('₹')) || (price >= 500);
+      const unitPriceStr = isRupee ? (formattedPrice || `₹${Math.round(price).toLocaleString('en-IN')}`) : usd.format(price);
+      const lineTotalStr = isRupee ? `₹${Math.round(price * qty).toLocaleString('en-IN')}` : usd.format(price * qty);
+
       const meta = document.createElement('p');
       meta.style.fontSize = '12px';
       meta.style.color = '#666';
       meta.style.marginBottom = '4px';
-      meta.textContent = `${sizeStr} · Qty: ${qty} · ${usd.format(price)} each`;
+      meta.textContent = `${sizeStr} · Qty: ${qty} · ${unitPriceStr} each`;
 
       const lineTotal = document.createElement('div');
       lineTotal.style.fontSize = '13px';
       lineTotal.style.fontWeight = '700';
       lineTotal.style.color = '#111';
-      lineTotal.textContent = `Total: ${usd.format(price * qty)}`;
+      lineTotal.textContent = `Total: ${lineTotalStr}`;
 
       details.append(h3, meta, lineTotal);
 
@@ -387,28 +397,27 @@
       container.appendChild(row);
     }
 
-    const inrAmount = subtotal * 86.50;
+    const hasRupeeItems = bagEntries.some(e => (e.formattedPrice && e.formattedPrice.includes('₹')) || (Number(e.price) >= 500));
+    const inrAmount = hasRupeeItems ? subtotal : (subtotal * 86.50);
+    const usdAmount = hasRupeeItems ? (subtotal / 86.50) : subtotal;
     const formattedInr = '₹' + inrAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const formattedInrShort = '₹' + inrAmount.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const formattedInrShort = '₹' + Math.round(inrAmount).toLocaleString('en-IN');
+    const formattedTotalDisplay = hasRupeeItems ? `₹${Math.round(inrAmount).toLocaleString('en-IN')}` : usd.format(usdAmount);
 
     if (totalEl) {
       totalEl.innerHTML = `
         <div style="margin-top: 16px; padding: 14px 16px; background: #fafafa; border: 1px solid #eaeaea; border-radius: 8px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:#666;">
             <span>Selected Products (${totalUnits} piece${totalUnits === 1 ? '' : 's'})</span>
-            <span>${usd.format(subtotal)}</span>
+            <span>${formattedTotalDisplay}</span>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:#666;">
             <span>Courier Delivery</span>
             <span style="color:#166534; font-weight:600;">Complimentary</span>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:#666;">
-            <span>UPI Conversion Rate (1 USD = ₹86.50)</span>
-            <span style="font-family:monospace; font-weight:600;">${formattedInr}</span>
-          </div>
           <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid #eaeaea; font-size:14px; font-weight:700; color:#111;">
             <span>Order Total</span>
-            <span>${usd.format(subtotal)} <span style="font-size:11px; font-weight:500; color:#166534;">(${formattedInr})</span></span>
+            <span>${formattedTotalDisplay} <span style="font-size:11px; font-weight:500; color:#166534;">(${hasRupeeItems ? 'Approx. ' + usd.format(usdAmount) + ' USD' : formattedInr})</span></span>
           </div>
         </div>
       `;
@@ -421,7 +430,7 @@
       } else if (selectedPaymentMethod === 'upi') {
         checkoutBtn.textContent = `Proceed with UPI (${formattedInrShort}) →`;
       } else {
-        checkoutBtn.textContent = `Instant Member Checkout (${usd.format(subtotal)}) →`;
+        checkoutBtn.textContent = `Instant Member Checkout (${formattedTotalDisplay}) →`;
       }
     }
   }
@@ -453,11 +462,15 @@
         const existing = bagEntries.find((e) => String(e.id) === String(item.id));
         if (existing) {
           existing.quantity = Math.min(20, (Number(existing.quantity) || 1) + qty);
+          if (item.price !== undefined) existing.price = Number(item.price);
+          if (item.formattedPrice) existing.formattedPrice = item.formattedPrice;
         } else if (bagEntries.length < 50) {
           bagEntries.push({
             id: String(item.id),
+            productId: String(item.productId || item.id),
             name: item.name || 'Product',
             price: Number(item.price) || 0,
+            formattedPrice: item.formattedPrice || '',
             size: String(item.size || 'M'),
             image: item.image || '',
             quantity: Math.min(20, qty)
@@ -488,7 +501,7 @@
       // Async sync to backend API if available
       try {
         const itm = Array.isArray(itemOrItems) ? itemOrItems[0] : itemOrItems;
-        fetch('http://127.0.0.1:8001/api/cart/guest_session/items', {
+        fetch(`${API_BASE_URL}/cart/guest_session/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -510,6 +523,9 @@
     },
     getCount() {
       return bagEntries.reduce((sum, e) => sum + (Number(e.quantity) || 1), 0);
+    },
+    syncPricesWithBackend() {
+      return typeof window.refreshBagPrices === 'function' ? window.refreshBagPrices() : Promise.resolve();
     }
   };
 
@@ -517,6 +533,74 @@
   window.RunwayBag = {
     add(items) {
       AtelierCart.add(items);
+    }
+  };
+
+  window.refreshBagPrices = async function(prodMap) {
+    if (!bagEntries || bagEntries.length === 0) return;
+    if (!prodMap) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/products?_t=${Date.now()}`, { cache: 'no-store' });
+        if (res.ok) {
+          const prods = await res.json();
+          prodMap = new Map();
+          prods.forEach(p => {
+            prodMap.set(p.id, p);
+            if (p.name) prodMap.set(p.name.toLowerCase(), p);
+            if (p.title) prodMap.set(p.title.toLowerCase(), p);
+          });
+        }
+      } catch (e) {}
+    }
+    if (!prodMap) return;
+
+    let modified = false;
+    const priceUpdates = [];
+
+    bagEntries.forEach(entry => {
+      let lookupId = String(entry.productId || entry.id);
+      if (lookupId.startsWith('orbit-')) {
+        const parts = lookupId.split('-');
+        if (parts.length >= 4) lookupId = parts.slice(1, -1).join('-');
+        else if (parts.length >= 2) lookupId = parts[1];
+      } else if (lookupId.startsWith('rack-')) {
+        const parts = lookupId.split('-');
+        if (parts.length >= 4) lookupId = parts.slice(0, 4).join('-');
+      }
+
+      let p = prodMap.get(lookupId) || (entry.productId ? prodMap.get(entry.productId) : null) || prodMap.get(entry.id);
+      if (!p) {
+        for (const val of prodMap.values()) {
+          if (val.id && (val.id === lookupId || val.id === entry.productId || val.id === entry.id || entry.id.includes(val.id))) {
+            p = val;
+            break;
+          }
+        }
+      }
+
+      if (p && p.numericPrice !== undefined) {
+        const oldPrice = Number(entry.price) || 0;
+        const newPrice = Number(p.numericPrice);
+        if (Math.abs(oldPrice - newPrice) > 0.01) {
+          const oldFormatted = entry.formattedPrice || (oldPrice >= 500 ? `₹${Math.round(oldPrice).toLocaleString('en-IN')}` : `$${oldPrice.toFixed(2)}`);
+          entry.price = newPrice;
+          entry.formattedPrice = p.price || (newPrice >= 500 ? `₹${Math.round(newPrice).toLocaleString('en-IN')}` : `$${newPrice.toFixed(2)}`);
+          modified = true;
+          priceUpdates.push({
+            name: entry.name || p.title,
+            oldPrice: oldFormatted,
+            newPrice: entry.formattedPrice
+          });
+        }
+      }
+    });
+
+    if (modified) {
+      saveBag(bagEntries);
+      renderBagDialog();
+      priceUpdates.forEach(u => {
+        showToast(`Price updated: "${u.name}" is now ${u.newPrice}`);
+      });
     }
   };
 
@@ -577,9 +661,15 @@
     }
 
     if (openBtn && dialog) {
-      openBtn.addEventListener('click', () => {
+      openBtn.addEventListener('click', async () => {
         resetDialogViews();
+        if (typeof window.refreshBagPrices === 'function') {
+          await window.refreshBagPrices();
+        }
         renderBagDialog();
+        if (window.syncStorefrontProducts) {
+          window.syncStorefrontProducts();
+        }
         dialog.showModal();
       });
     }
@@ -648,6 +738,12 @@
       checkoutBtn.addEventListener('click', async () => {
         if (bagEntries.length === 0) return;
 
+        // Authoritative price refresh before checkout calculation
+        if (typeof window.refreshBagPrices === 'function') {
+          await window.refreshBagPrices();
+          bagEntries = loadBag();
+        }
+
         // 1. Check if user is logged in
         let user = null;
         try {
@@ -660,7 +756,7 @@
           showToast('Please sign in to place your order.');
           sessionStorage.setItem('pending_checkout', 'true');
           setTimeout(() => {
-            window.location.href = '/login.html';
+            window.location.href = '/account/login.html';
           }, 500);
           return;
         }
@@ -697,9 +793,12 @@
           activeUpiOrderId = orderId;
 
           try {
-            const res = await fetch('http://127.0.0.1:8001/api/upi/create-intent', {
+            const res = await fetch(`${API_BASE_URL}/upi/create-intent`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('atelier_token') || ''}`
+              },
               body: JSON.stringify({
                 orderId: orderId,
                 amountUsd: subtotal,
@@ -754,9 +853,12 @@
         checkoutBtn.textContent = 'Recording Order in Firestore...';
 
         try {
-          const res = await fetch('http://127.0.0.1:8001/api/orders', {
+          const res = await fetch(`${API_BASE_URL}/orders`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('atelier_token') || ''}`
+            },
             body: JSON.stringify({
               customer_name: user.name || 'Member',
               customer_email: user.email || 'member@atelier.com',
@@ -766,6 +868,16 @@
             })
           });
 
+          if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            const errMsg = errJson.detail || 'Order checkout validation failed. Please review your cart.';
+            showToast(errMsg);
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Retry Checkout';
+            if (window.syncStorefrontProducts) window.syncStorefrontProducts();
+            return;
+          }
+
           const orderData = await res.json();
           const confirmedId = orderData.id || ('ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase());
           
@@ -774,11 +886,9 @@
           updateCounters();
           displayOrderSuccess(confirmedId, user.name, subtotal, '💳 Member Instant Card', orderItems);
         } catch (err) {
-          const fallbackId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-          bagEntries = [];
-          saveBag(bagEntries);
-          updateCounters();
-          displayOrderSuccess(fallbackId, user.name, subtotal, '💳 Member Instant Card', orderItems);
+          showToast(err.message || 'Network error during checkout.');
+          checkoutBtn.disabled = false;
+          checkoutBtn.textContent = 'Retry Checkout';
         }
       });
     }
@@ -807,9 +917,12 @@
         confirmUtrBtn.textContent = 'Verifying & Recording...';
 
         try {
-          const res = await fetch('http://127.0.0.1:8001/api/upi/submit-utr', {
+          const res = await fetch(`${API_BASE_URL}/upi/submit-utr`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('atelier_token') || ''}`
+            },
             body: JSON.stringify({
               orderId: activeUpiOrderId || ('ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase()),
               utr: utrVal,
@@ -898,7 +1011,7 @@
       }
 
       try {
-        const res = await fetch(`http://127.0.0.1:8001/api/orders/${orderId}/invoice`);
+        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/invoice`);
         const inv = await res.json();
 
         // Populate Bill Card Details
@@ -1029,7 +1142,7 @@
     if (viewBillBtn) {
       viewBillBtn.addEventListener('click', () => {
         if (!lastConfirmedOrder) return;
-        const invoiceUrl = `http://127.0.0.1:8001/api/orders/${lastConfirmedOrder.id}/invoice/html`;
+        const invoiceUrl = `${API_BASE_URL}/orders/${lastConfirmedOrder.id}/invoice/html`;
         window.open(invoiceUrl, '_blank');
       });
     }
@@ -1039,7 +1152,7 @@
         if (!lastConfirmedOrder) return;
         downloadBillBtn.textContent = 'Generating...';
         try {
-          const res = await fetch(`http://127.0.0.1:8001/api/orders/${lastConfirmedOrder.id}/invoice/html`);
+          const res = await fetch(`${API_BASE_URL}/orders/${lastConfirmedOrder.id}/invoice/html`);
           const html = await res.text();
           const blob = new Blob([html], { type: 'text/html' });
           const url = URL.createObjectURL(blob);
@@ -1052,7 +1165,7 @@
           URL.revokeObjectURL(url);
           showToast(`Invoice downloaded for Order ${lastConfirmedOrder.id}`);
         } catch (err) {
-          window.open(`http://127.0.0.1:8001/api/orders/${lastConfirmedOrder.id}/invoice/html`, '_blank');
+          window.open(`${API_BASE_URL}/orders/${lastConfirmedOrder.id}/invoice/html`, '_blank');
         } finally {
           downloadBillBtn.innerHTML = '<span>📥 Download (.html)</span>';
         }
@@ -1080,6 +1193,8 @@
           if (popoverName) popoverName.textContent = u.name || 'Member';
           if (popoverEmail) popoverEmail.textContent = u.email || 'member@atelier.com';
           if (popoverAvatar) popoverAvatar.textContent = (u.name || 'M').charAt(0).toUpperCase();
+          const adminLink = document.getElementById('popover-admin-link');
+          if (adminLink) adminLink.style.display = (u.role === 'ADMIN') ? 'block' : 'none';
         } else {
           if (accountBadge) accountBadge.style.display = 'none';
           if (headerAccountBtn) headerAccountBtn.title = 'Account Login';

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Payments & UTR Reconciliation — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link active"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Payment & UPI UTR Reconciliation Queue</div>
+        <div class="topbar-actions">
+          <button onclick="loadPayments()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh Queue
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Incoming UPI & Card Transactions</h2>
+              <p class="panel-desc">Verify customer-submitted 12-digit UTR references against merchant bank deposits before confirming orders.</p>
+            </div>
+            <div>
+              <select id="payment-status-filter" class="filter-input" onchange="loadPayments()">
+                <option value="">All Transactions</option>
+                <option value="UNDER_REVIEW">Under Review (Pending Action)</option>
+                <option value="VERIFIED">Verified & Cleared</option>
+                <option value="FAILED">Failed / Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Payment ID</th>
+                  <th>Order Reference</th>
+                  <th>12-Digit UPI UTR</th>
+                  <th>Amount</th>
+                  <th>Customer Info</th>
+                  <th>Verification Status</th>
+                  <th>Submission Time</th>
+                  <th>Reconciliation Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">Loading payment transactions...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      let payments = [];
+
+      async function loadPayments() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const filter = document.getElementById('payment-status-filter').value;
+        const tbody = document.getElementById('payments-table-body');
+        try {
+          const url = filter ? `/admin/payments?status=${encodeURIComponent(filter)}` : '/admin/payments';
+          payments = await AdminApp.apiRequest(url);
+
+          if (payments.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--admin-text-muted); padding: 32px;">No payment records in this state.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = payments.map(p => {
+            const dateStr = new Date(p.created_at).toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const isPending = p.status.toUpperCase() === 'UNDER_REVIEW';
+            const pillClass = `pill-${p.status.toLowerCase()}`;
+
+            return `
+              <tr>
+                <td style="font-family: monospace; font-weight: 700; color: #fff;">${p.payment_id}</td>
+                <td>
+                  <a href="/admin/orders.html?id=${p.order_id}" style="color: var(--admin-accent-gold); font-family: monospace; font-weight: 600; text-decoration: underline;">
+                    ${p.order_id}
+                  </a>
+                </td>
+                <td style="font-family: monospace; font-weight: 700; color: #fff; font-size: 14px; letter-spacing: 1px;">
+                  ${p.utr_reference || 'N/A'}
+                </td>
+                <td>
+                  <div style="font-weight: 700; color: #fff;">₹${Number(p.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+                  <div style="font-size: 11px; color: var(--admin-text-muted);">$${Number(p.amount_usd || 0).toFixed(2)} USD</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600;">${p.customer_name || 'Member'}</div>
+                  <div style="font-size: 11px; color: var(--admin-text-muted);">${p.customer_email || ''}</div>
+                </td>
+                <td><span class="status-pill ${pillClass}">${p.status}</span></td>
+                <td style="color: var(--admin-text-muted); font-size: 12px;">${dateStr}</td>
+                <td>
+                  ${isPending ? `
+                    <div style="display: flex; gap: 6px;">
+                      <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="reconcilePayment('${p.payment_id}', 'VERIFIED')">
+                        ✓ Verify & Confirm
+                      </button>
+                      <button class="admin-btn admin-btn-danger admin-btn-sm" onclick="reconcilePayment('${p.payment_id}', 'FAILED')">
+                        ✕ Reject
+                      </button>
+                    </div>
+                  ` : `
+                    <span style="font-size: 11px; color: var(--admin-text-dim);">Reconciled by ${p.verified_by || 'Admin'}</span>
+                  `}
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="8" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load payments: ${err.message}</td></tr>`;
+        }
+      }
+
+      async function reconcilePayment(paymentId, status) {
+        const actionLabel = status === 'VERIFIED' ? 'verify and credit this transaction' : 'reject this payment as invalid';
+        if (!confirm(`Are you sure you want to ${actionLabel}? This will automatically update the linked order.`)) return;
+
+        try {
+          await AdminApp.apiRequest(`/admin/payments/${paymentId}/verify`, {
+            method: 'POST',
+            body: JSON.stringify({ status })
+          });
+          AdminApp.showToast(`Payment ${paymentId} marked as ${status}. Linked order updated.`);
+          loadPayments();
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadPayments;
+    </script>
+  </body>
+</html>

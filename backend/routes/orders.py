@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse
-from ..models import Order, OrderCreate
+from ..models import Order, OrderCreate, OrderCancellationRequest, OrderRefundRequest
 from ..services.firestore_service import FirestoreService
+from ..security import get_optional_current_user, require_customer, require_admin
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -19,23 +20,66 @@ COMPANY_INFO = {
 }
 
 @router.post("", response_model=Order, status_code=201)
-def place_order(order_data: OrderCreate):
+def place_order(order_data: OrderCreate, current_user: Optional[Dict[str, Any]] = Depends(get_optional_current_user)):
     """Place a checkout order and save it directly into the Firestore orders collection."""
     if not order_data.items:
         raise HTTPException(status_code=400, detail="Cannot place an order with zero items.")
-    return FirestoreService.create_order(order_data.model_dump())
+    
+    payload = order_data.model_dump()
+    if current_user:
+        payload["customer_id"] = current_user.get("user_id")
+        payload["customer_email"] = current_user.get("email", payload.get("customer_email"))
+        if not payload.get("customer_name") or payload.get("customer_name") == "Anonymous":
+            payload["customer_name"] = current_user.get("name", "Member")
+    
+    try:
+        return FirestoreService.create_order(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/my-orders", response_model=List[Order])
+def get_my_orders(current_user: Dict[str, Any] = Depends(require_customer)):
+    """Retrieve all orders placed by the authenticated customer."""
+    return FirestoreService.get_orders_for_customer(current_user["email"])
 
 @router.get("/{order_id}", response_model=Order)
-def get_order(order_id: str):
-    """Retrieve an existing order by ID."""
+def get_order(order_id: str, current_user: Optional[Dict[str, Any]] = Depends(get_optional_current_user)):
+    """Retrieve an existing order by ID. Customers can only view their own orders."""
     order = FirestoreService.get_order(order_id)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
+    
+    if current_user:
+        role = current_user.get("role", "").upper()
+        if role != "ADMIN" and current_user.get("email", "").lower() != order.customer_email.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied: You do not have permission to view another customer's order."
+            )
+    return order
+
+@router.post("/{order_id}/cancel", response_model=Order)
+def cancel_order(order_id: str, payload: OrderCancellationRequest, current_user: Dict[str, Any] = Depends(require_customer)):
+    """Customer request to cancel an order."""
+    try:
+        order = FirestoreService.request_order_cancellation(order_id, current_user["email"], payload.reason)
+        if not order:
+            raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found or does not belong to you.")
+        return order
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/{order_id}/refund", response_model=Order)
+def request_refund(order_id: str, payload: OrderRefundRequest, current_user: Dict[str, Any] = Depends(require_customer)):
+    """Customer request for order refund."""
+    order = FirestoreService.request_order_refund(order_id, current_user["email"], payload.reason)
+    if not order:
+        raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found or does not belong to you.")
     return order
 
 @router.get("", response_model=List[Order])
-def list_orders():
-    """List recent orders saved in Firestore."""
+def list_orders(current_user: Dict[str, Any] = Depends(require_admin)):
+    """List recent orders saved in Firestore (Admin access only)."""
     return FirestoreService.list_orders()
 
 @router.get("/{order_id}/invoice")
@@ -45,15 +89,47 @@ def get_order_invoice(order_id: str):
     if not order:
         raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
     
-    total_usd = float(order.total)
-    total_inr = round(total_usd * USD_TO_INR_RATE, 2)
-    subtotal_inr = round(float(order.subtotal) * USD_TO_INR_RATE, 2)
+    is_inr = float(order.total) >= 500 or any(float(i.price) >= 500 for i in order.items)
+    if is_inr:
+        total_inr = round(float(order.total), 2)
+        total_usd = round(total_inr / USD_TO_INR_RATE, 2)
+        subtotal_inr = round(float(order.subtotal), 2)
+        subtotal_usd = round(subtotal_inr / USD_TO_INR_RATE, 2)
+    else:
+        total_usd = float(order.total)
+        total_inr = round(total_usd * USD_TO_INR_RATE, 2)
+        subtotal_usd = float(order.subtotal)
+        subtotal_inr = round(subtotal_usd * USD_TO_INR_RATE, 2)
+
     tax_inr = round(total_inr * 0.18 / 1.18, 2) # 18% GST inclusive
     cgst_inr = round(tax_inr / 2, 2)
     sgst_inr = round(tax_inr / 2, 2)
 
     invoice_number = f"INV-{datetime.utcnow().year}-{order.id}"
     
+    formatted_items = []
+    for item in order.items:
+        if is_inr:
+            p_inr = round(float(item.price), 2)
+            p_usd = round(p_inr / USD_TO_INR_RATE, 2)
+            lt_inr = round(p_inr * item.quantity, 2)
+            lt_usd = round(lt_inr / USD_TO_INR_RATE, 2)
+        else:
+            p_usd = round(float(item.price), 2)
+            p_inr = round(p_usd * USD_TO_INR_RATE, 2)
+            lt_usd = round(p_usd * item.quantity, 2)
+            lt_inr = round(p_usd * item.quantity * USD_TO_INR_RATE, 2)
+        formatted_items.append({
+            "product_id": item.product_id,
+            "title": item.title,
+            "size": item.size,
+            "quantity": item.quantity,
+            "price_usd": p_usd,
+            "price_inr": p_inr,
+            "line_total_usd": lt_usd,
+            "line_total_inr": lt_inr
+        })
+
     return {
         "invoice_number": invoice_number,
         "invoice_date": order.created_at.strftime("%d %b %Y, %H:%M:%S UTC") if isinstance(order.created_at, datetime) else str(order.created_at),
@@ -68,21 +144,9 @@ def get_order_invoice(order_id: str):
             "status": "PAID & VERIFIED",
             "currency_rate": f"1 USD = ₹{USD_TO_INR_RATE:.2f} INR"
         },
-        "items": [
-            {
-                "product_id": item.product_id,
-                "title": item.title,
-                "size": item.size,
-                "quantity": item.quantity,
-                "price_usd": item.price,
-                "price_inr": round(item.price * USD_TO_INR_RATE, 2),
-                "line_total_usd": round(item.price * item.quantity, 2),
-                "line_total_inr": round(item.price * item.quantity * USD_TO_INR_RATE, 2)
-            }
-            for item in order.items
-        ],
+        "items": formatted_items,
         "financials": {
-            "subtotal_usd": order.subtotal,
+            "subtotal_usd": subtotal_usd,
             "subtotal_inr": subtotal_inr,
             "shipping_usd": 0.0,
             "shipping_inr": 0.0,

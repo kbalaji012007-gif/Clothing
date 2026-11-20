@@ -39,7 +39,7 @@
           <div id="site-search-dropdown" class="search-dropdown-menu" style="display:none;"></div>
         </div>
         <div style="position: relative;">
-          <a href="/login.html" class="header-icon-btn" id="header-account-btn" aria-label="Account Login" title="Account Login">
+          <a href="/account/login.html" class="header-icon-btn" id="header-account-btn" aria-label="Customer Account" title="Customer Account">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
@@ -58,11 +58,23 @@
             </div>
             <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 14px; letter-spacing: 0.5px;">✓ Atelier Verified Member</div>
             <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button type="button" id="popover-cart-btn" style="width: 100%; padding: 9px 12px; background: #f5f5f5; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; color: #111; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+              <a href="/account/dashboard.html" style="width: 100%; padding: 9px 12px; background: #111; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; display: block;">
+                Customer Dashboard →
+              </a>
+              <a href="/account/orders.html" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border-radius: 6px; font-size: 12px; font-weight: 600; color: #111; text-align: left; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">
+                <span>📦 My Purchases & Tracking</span>
+              </a>
+              <a href="/account/wishlist.html" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border-radius: 6px; font-size: 12px; font-weight: 600; color: #111; text-align: left; text-decoration: none; display: flex; justify-content: space-between; align-items: center;">
+                <span>❤️ Saved Wishlist</span>
+              </a>
+              <a id="popover-admin-link" href="/admin/dashboard.html" style="display: none; width: 100%; padding: 8px 12px; background: #d4af37; color: #000; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: left; text-decoration: none;">
+                <span>✦ Admin HQ Console</span>
+              </a>
+              <button type="button" id="popover-cart-btn" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; color: #111; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center;">
                 <span>Shopping Bag</span>
                 <span id="popover-cart-badge" style="background: #111; color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 11px;">0</span>
               </button>
-              <button type="button" id="popover-signout-btn" style="width: 100%; padding: 9px 12px; background: #fff; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 13px; font-weight: 600; color: #dc2626; cursor: pointer; text-align: left;">
+              <button type="button" id="popover-signout-btn" style="width: 100%; padding: 8px 12px; background: #fff; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 12px; font-weight: 600; color: #dc2626; cursor: pointer; text-align: left;">
                 Sign Out
               </button>
             </div>
@@ -191,7 +203,7 @@
           <div class="orbit-meta-inner">
             <div class="orbit-counter" id="orbit-counter">01 / 07</div>
             <h2 class="orbit-shoe-name" id="orbit-name">LUKA 5</h2>
-            <div class="orbit-shoe-price" id="orbit-price">$149.00</div>
+            <div class="orbit-shoe-price" id="orbit-price">₹4,999</div>
             <a class="orbit-view-details" href="#details" id="orbit-view-details">
               <span>View details</span>
               <span class="orbit-arrow">→</span>

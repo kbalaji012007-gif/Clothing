@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Atelier Administration Portal</title>
+    <script src="/admin/admin.js"></script>
+    <script>
+      (function() {
+        const token = AdminApp.getToken();
+        const user = AdminApp.getUser();
+        if (token && user && user.role === 'ADMIN') {
+          window.location.replace('/admin/dashboard.html');
+        } else {
+          window.location.replace('/admin/login.html');
+        }
+      })();
+    </script>
+  </head>
+  <body style="background: #0b0b0e; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh;">
+    <p>Redirecting to Atelier Management Suite...</p>
+  </body>
+</html>

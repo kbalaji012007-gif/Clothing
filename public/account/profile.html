@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Profile & Sizing — Atelier</title>
+    <link rel="stylesheet" href="/account/account.css" />
+    <style>
+      .address-card {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+      }
+      .address-badge {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #111;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Header -->
+    <header class="account-header">
+      <div class="brand-wrap">
+        <a href="/" class="brand-title">ATELIER</a>
+        <span class="portal-tag">Customer Portal</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/">Storefront</a>
+        <a href="/account/dashboard.html">Dashboard</a>
+        <a href="/account/orders.html">Orders</a>
+        <a href="/account/wishlist.html">Wishlist</a>
+        <a href="/" class="btn-storefront">🛍 Return to Bag</a>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="account-container">
+      <div class="account-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="account-sidebar">
+          <div class="user-badge">
+            <div id="user-sidebar-avatar" class="user-avatar">AV</div>
+            <div class="user-info">
+              <h4 id="user-sidebar-name">Loading...</h4>
+              <p id="user-sidebar-email">...</p>
+            </div>
+          </div>
+          <ul class="sidebar-menu">
+            <li><a href="/account/dashboard.html" class="sidebar-link"><span>📊</span> Dashboard</a></li>
+            <li><a href="/account/orders.html" class="sidebar-link"><span>📦</span> Purchases & Tracking</a></li>
+            <li><a href="/account/profile.html" class="sidebar-link active"><span>👤</span> Profile & Sizing</a></li>
+            <li><a href="/account/wishlist.html" class="sidebar-link"><span>❤️</span> Saved Wishlist</a></li>
+            <li><a href="/" class="sidebar-link"><span>✨</span> Shop Collections</a></li>
+            <li><a href="#" id="btn-logout" class="sidebar-link logout"><span>🚪</span> Sign Out</a></li>
+          </ul>
+        </aside>
+
+        <!-- Profile Content -->
+        <section class="account-content">
+          <!-- Personal Info Card -->
+          <div class="content-card">
+            <h2 class="card-title">Personal Details</h2>
+            <p class="card-desc">Your verified account information and contact preferences.</p>
+
+            <form id="profile-form">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="form-label" for="profile-name">Full Name</label>
+                  <input type="text" id="profile-name" class="form-input" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profile-email">Email Address</label>
+                  <input type="email" id="profile-email" class="form-input" disabled style="background: #f5f5f5;" />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="form-label" for="profile-phone">Contact Phone</label>
+                  <input type="tel" id="profile-phone" class="form-input" placeholder="+91 98765 43210" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Client Membership Tier</label>
+                  <div style="padding: 10px 14px; background: #f5f5f5; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;">
+                    ★ Atelier VIP Private Member
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" id="save-profile-btn" class="btn btn-primary btn-sm">Save Changes</button>
+            </form>
+          </div>
+
+          <!-- Saved Delivery Addresses -->
+          <div class="content-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 class="card-title">Delivery Addresses</h3>
+                <p class="card-desc" style="margin-bottom: 0;">Saved destinations for expedited courier dispatch.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openAddAddressModal()">+ Add New Address</button>
+            </div>
+
+            <div id="addresses-list">
+              <div style="text-align: center; padding: 24px; color: var(--text-secondary);">Loading addresses...</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Add Address Modal -->
+    <div id="address-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 style="font-size: 16px; font-weight: 700;">Add Delivery Address</h3>
+          <button class="modal-close" onclick="closeAddressModal()">&times;</button>
+        </div>
+        <form id="address-form">
+          <div class="form-group">
+            <label class="form-label" for="addr-tag">Address Tag</label>
+            <input type="text" id="addr-tag" class="form-input" required placeholder="e.g. Home, Studio, Flagship Office" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="addr-line1">Street Address</label>
+            <input type="text" id="addr-line1" class="form-input" required placeholder="Apartment / Suite / Street line" />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="addr-city">City</label>
+              <input type="text" id="addr-city" class="form-input" required placeholder="New Delhi" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="addr-postal">Postal Code</label>
+              <input type="text" id="addr-postal" class="form-input" required placeholder="110001" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="addr-country">Country</label>
+            <input type="text" id="addr-country" class="form-input" required value="India" />
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeAddressModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Address</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/account/account.js"></script>
+    <script>
+      let currentAddresses = [];
+
+      async function loadProfile() {
+        if (!AccountApp.requireAuth()) return;
+        AccountApp.initSidebar();
+
+        try {
+          const res = await AccountApp.apiRequest('/auth/me');
+          const user = res.user;
+
+          document.getElementById('profile-name').value = user.name || '';
+          document.getElementById('profile-email').value = user.email || '';
+          document.getElementById('profile-phone').value = user.phone || '';
+
+          currentAddresses = user.addresses || [];
+          renderAddresses();
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        }
+      }
+
+      function renderAddresses() {
+        const container = document.getElementById('addresses-list');
+        if (currentAddresses.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 24px; color: var(--text-secondary); background: var(--bg-secondary); border-radius: var(--radius-sm);">
+              No delivery addresses saved yet. Click "+ Add New Address" above.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = currentAddresses.map((addr, index) => `
+          <div class="address-card">
+            <div>
+              <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                <span class="address-badge">${addr.tag || 'Address'}</span>
+                <strong style="font-size: 13px;">${addr.line1}</strong>
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary);">
+                ${addr.city}, ${addr.postal_code || ''} · ${addr.country || 'India'}
+              </div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteAddress(${index})">Remove</button>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('profile-name').value.trim();
+        const phone = document.getElementById('profile-phone').value.trim();
+        const btn = document.getElementById('save-profile-btn');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+          const res = await AccountApp.apiRequest('/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ name, phone })
+          });
+          AccountApp.setSession(AccountApp.getToken(), res.user);
+          AccountApp.showToast('Profile updated successfully.');
+          AccountApp.initSidebar();
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+        }
+      });
+
+      function openAddAddressModal() {
+        document.getElementById('address-modal').style.display = 'flex';
+      }
+      function closeAddressModal() {
+        document.getElementById('address-modal').style.display = 'none';
+      }
+
+      document.getElementById('address-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newAddr = {
+          id: 'addr_' + Date.now(),
+          tag: document.getElementById('addr-tag').value.trim(),
+          line1: document.getElementById('addr-line1').value.trim(),
+          city: document.getElementById('addr-city').value.trim(),
+          postal_code: document.getElementById('addr-postal').value.trim(),
+          country: document.getElementById('addr-country').value.trim()
+        };
+
+        currentAddresses.push(newAddr);
+        try {
+          await AccountApp.apiRequest('/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ addresses: currentAddresses })
+          });
+          AccountApp.showToast('Address added.');
+          closeAddressModal();
+          document.getElementById('address-form').reset();
+          renderAddresses();
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        }
+      });
+
+      async function deleteAddress(index) {
+        if (!confirm('Remove this delivery address?')) return;
+        currentAddresses.splice(index, 1);
+        try {
+          await AccountApp.apiRequest('/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ addresses: currentAddresses })
+          });
+          AccountApp.showToast('Address removed.');
+          renderAddresses();
+        } catch (err) {
+          AccountApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadProfile;
+    </script>
+  </body>
+</html>

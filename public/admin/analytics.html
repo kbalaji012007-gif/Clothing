@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Business Analytics & Velocity — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link active"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Financial Intelligence & Performance Metrics</div>
+        <div class="topbar-actions">
+          <button onclick="loadAnalytics()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Re-calculate
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <!-- Overview KPIs -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Gross Processed Sales</div>
+            <div id="an-gross-sales" class="metric-value">$0.00</div>
+            <div id="an-gross-inr" class="metric-sub">₹0.00 INR</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Average Order Value (AOV)</div>
+            <div id="an-aov" class="metric-value">$0.00</div>
+            <div class="metric-sub">Per completed transaction</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Payment Success Rate</div>
+            <div id="an-success-rate" class="metric-value" style="color: var(--admin-success);">0%</div>
+            <div class="metric-sub">Cleared transactions</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Active Patron Base</div>
+            <div id="an-client-base" class="metric-value">0</div>
+            <div class="metric-sub">Registered accounts</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Top Selling Pieces -->
+          <div class="admin-panel">
+            <h3 class="panel-title" style="margin-bottom: 16px;">Top-Selling Atelier Pieces</h3>
+            <div id="top-products-list">
+              <div style="color: var(--admin-text-muted);">Calculating sales distribution...</div>
+            </div>
+          </div>
+
+          <!-- Payment Methods Breakdown -->
+          <div class="admin-panel">
+            <h3 class="panel-title" style="margin-bottom: 16px;">Payment Method Distribution</h3>
+            <div id="payment-method-distribution">
+              <div style="color: var(--admin-text-muted);">Aggregating gateway metrics...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Workflow Breakdown -->
+        <div class="admin-panel" style="margin-top: 24px;">
+          <h3 class="panel-title" style="margin-bottom: 16px;">Order Workflow Status Breakdown</h3>
+          <div id="status-distribution-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+            <div style="color: var(--admin-text-muted);">Computing status states...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      async function loadAnalytics() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        try {
+          const orders = await AdminApp.apiRequest('/admin/orders?limit=500');
+          const users = await AdminApp.apiRequest('/admin/customers');
+
+          const completedOrders = orders.filter(o => !['CANCELLED', 'PAYMENT_FAILED'].includes(o.status.toUpperCase()));
+          const grossUsd = completedOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+          const aov = completedOrders.length > 0 ? (grossUsd / completedOrders.length) : 0;
+          const successRate = orders.length > 0 ? ((completedOrders.length / orders.length) * 100) : 100;
+
+          document.getElementById('an-gross-sales').textContent = `$${grossUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+          document.getElementById('an-gross-inr').textContent = `₹${(grossUsd * 86.5).toLocaleString('en-IN', { minimumFractionDigits: 2 })} INR`;
+          document.getElementById('an-aov').textContent = `$${aov.toFixed(2)}`;
+          document.getElementById('an-success-rate').textContent = `${successRate.toFixed(1)}%`;
+          document.getElementById('an-client-base').textContent = users.length;
+
+          // Compute Top Products
+          const productSales = {};
+          orders.forEach(o => {
+            (o.items || []).forEach(item => {
+              const name = item.title || item.product_id;
+              productSales[name] = (productSales[name] || 0) + Number(item.quantity || 1);
+            });
+          });
+
+          const sortedProds = Object.entries(productSales).sort((a, b) => b[1] - a[1]).slice(0, 5);
+          const topListEl = document.getElementById('top-products-list');
+          if (sortedProds.length === 0) {
+            topListEl.innerHTML = `<div style="color: var(--admin-text-muted); padding: 12px;">No sales data available yet.</div>`;
+          } else {
+            topListEl.innerHTML = sortedProds.map(([name, qty]) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--admin-border-subtle);">
+                <strong style="color: #fff; font-size: 13px;">${name}</strong>
+                <span style="font-weight: 700; color: var(--admin-accent-gold);">${qty} sold</span>
+              </div>
+            `).join('');
+          }
+
+          // Payment Methods
+          let upiCount = 0;
+          let cardCount = 0;
+          orders.forEach(o => {
+            if (String(o.payment_method).toLowerCase().includes('upi')) upiCount++;
+            else cardCount++;
+          });
+          const totalPay = upiCount + cardCount || 1;
+          const upiPct = ((upiCount / totalPay) * 100).toFixed(1);
+          const cardPct = ((cardCount / totalPay) * 100).toFixed(1);
+
+          document.getElementById('payment-method-distribution').innerHTML = `
+            <div style="margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                <span>⚡ YouPI-PG Gateway (UPI / QR)</span>
+                <strong>${upiCount} orders (${upiPct}%)</strong>
+              </div>
+              <div style="height: 8px; background: #222; border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${upiPct}%; background: var(--admin-accent-gold);"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                <span>💳 Member Instant Card</span>
+                <strong>${cardCount} orders (${cardPct}%)</strong>
+              </div>
+              <div style="height: 8px; background: #222; border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${cardPct}%; background: var(--admin-info);"></div>
+              </div>
+            </div>
+          `;
+
+          // Order Status Distribution
+          const statusCounts = {};
+          orders.forEach(o => {
+            const st = o.status.toUpperCase();
+            statusCounts[st] = (statusCounts[st] || 0) + 1;
+          });
+
+          const statusGrid = document.getElementById('status-distribution-grid');
+          statusGrid.innerHTML = Object.entries(statusCounts).map(([st, cnt]) => `
+            <div style="background: var(--admin-bg-base); padding: 14px; border-radius: 6px; border: 1px solid var(--admin-border-subtle); text-align: center;">
+              <span style="font-size: 10px; font-weight: 700; color: var(--admin-text-muted); text-transform: uppercase;">${st}</span>
+              <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 4px;">${cnt}</div>
+            </div>
+          `).join('');
+
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadAnalytics;
+    </script>
+  </body>
+</html>

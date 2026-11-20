@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Product Catalog & Inventory — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link active"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Product Catalog & Merchandising</div>
+        <div class="topbar-actions">
+          <button onclick="openCreateProductModal()" class="admin-btn admin-btn-gold admin-btn-sm">
+            + Register New Product
+          </button>
+          <button onclick="loadProducts()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Active Catalog Items</h2>
+              <p class="panel-desc">Sneakers, 3D Clothing Rack garments, and Runway pieces.</p>
+            </div>
+            <div>
+              <select id="category-filter" class="filter-input" onchange="loadProducts()">
+                <option value="">All Categories</option>
+                <option value="sneakers">Sneakers (Sneaker Orbit)</option>
+                <option value="rack">Apparel (Clothing Rack)</option>
+                <option value="runway">Runway Ensembles</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Sizes</th>
+                  <th>Stock Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">Loading products...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Create Product Modal -->
+    <div id="create-product-modal" class="admin-modal-overlay">
+      <div class="admin-modal-card">
+        <div class="modal-head">
+          <h3>Register New Product</h3>
+          <button class="close-modal-btn" onclick="closeCreateProductModal()">&times;</button>
+        </div>
+        <form id="create-product-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Product Slug ID</label>
+              <input type="text" id="create-prod-id" class="filter-input" style="width: 100%;" required placeholder="e.g. jordan-retro-high" />
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Display Title</label>
+              <input type="text" id="create-prod-title" class="filter-input" style="width: 100%;" required placeholder="AIR JORDAN RETRO HIGH" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Category</label>
+              <select id="create-prod-category" class="filter-input" style="width: 100%;">
+                <option value="sneakers">Sneakers</option>
+                <option value="rack">Apparel Rack</option>
+                <option value="runway">Runway Ensembles</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Price & Currency</label>
+              <div style="display: flex; gap: 6px;">
+                <select id="create-prod-currency" class="filter-input" style="width: 80px;">
+                  <option value="INR">₹ INR</option>
+                  <option value="USD">$ USD</option>
+                </select>
+                <input type="number" step="0.01" id="create-prod-price" class="filter-input" style="flex: 1;" required placeholder="4999.00" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Image Asset URL</label>
+            <input type="text" id="create-prod-image" class="filter-input" style="width: 100%;" placeholder="/assets/sneakers/sneaker-1.webp" />
+          </div>
+
+          <div class="form-group">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Available Sizes (Comma Separated)</label>
+            <input type="text" id="create-prod-sizes" class="filter-input" style="width: 100%;" value="40, 41, 42, 43, 44, 45, 46" />
+          </div>
+
+          <div class="form-group">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Description</label>
+            <textarea id="create-prod-desc" class="filter-input" style="width: 100%;" rows="2" placeholder="Luxury craftsmanship details..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="closeCreateProductModal()">Cancel</button>
+            <button type="submit" class="admin-btn admin-btn-gold admin-btn-sm">Register Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="edit-product-modal" class="admin-modal-overlay">
+      <div class="admin-modal-card">
+        <div class="modal-head">
+          <h3 id="edit-modal-title">Edit Product</h3>
+          <button class="close-modal-btn" onclick="closeEditProductModal()">&times;</button>
+        </div>
+        <form id="edit-product-form">
+          <input type="hidden" id="edit-prod-id" />
+          <div class="form-group">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Display Title</label>
+            <input type="text" id="edit-prod-title" class="filter-input" style="width: 100%;" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Price & Currency</label>
+              <div style="display: flex; gap: 6px;">
+                <select id="edit-prod-currency" class="filter-input" style="width: 80px;">
+                  <option value="INR">₹ INR</option>
+                  <option value="USD">$ USD</option>
+                </select>
+                <input type="number" step="0.01" id="edit-prod-price" class="filter-input" style="flex: 1;" required />
+              </div>
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Inventory Stock Status</label>
+              <select id="edit-prod-stock" class="filter-input" style="width: 100%;">
+                <option value="true">In Stock</option>
+                <option value="false">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--admin-text-muted); margin-bottom:4px;">Description</label>
+            <textarea id="edit-prod-desc" class="filter-input" style="width: 100%;" rows="2"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="closeEditProductModal()">Cancel</button>
+            <button type="submit" class="admin-btn admin-btn-gold admin-btn-sm">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      let catalog = [];
+
+      async function loadProducts() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const cat = document.getElementById('category-filter').value;
+        const tbody = document.getElementById('products-table-body');
+        try {
+          const url = cat ? `/admin/products?category=${encodeURIComponent(cat)}` : '/admin/products';
+          catalog = await AdminApp.apiRequest(url);
+
+          if (catalog.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 32px;">No products found in this category.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = catalog.map(p => `
+            <tr>
+              <td>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 44px; height: 44px; background: #000; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <img src="${p.image || p.frontImage || '/assets/nike-logo.svg'}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  </div>
+                  <div>
+                    <strong style="color: #fff; font-size: 13px;">${p.title}</strong>
+                    <div style="font-size: 11px; color: var(--admin-text-muted); font-family: monospace;">ID: ${p.id}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="text-transform: uppercase; font-size: 11px; font-weight: 600;">${p.category}</td>
+              <td style="font-weight: 700; color: #fff;">${p.price || (p.numericPrice >= 500 ? '₹' + Math.round(p.numericPrice).toLocaleString('en-IN') : '$' + Number(p.numericPrice || 0).toFixed(2))}</td>
+              <td style="font-size: 12px; color: var(--admin-text-muted);">${(p.sizes || []).join(', ')}</td>
+              <td>
+                <span class="status-pill ${p.in_stock ? 'pill-confirmed' : 'pill-failed'}">
+                  ${p.in_stock ? 'In Stock' : 'Out of Stock'}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <button class="admin-btn admin-btn-secondary admin-btn-sm" onclick="openEditProductModal('${p.id}')">Edit</button>
+                  <button class="admin-btn admin-btn-danger admin-btn-sm" onclick="deleteProduct('${p.id}')">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `).join('');
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load products: ${err.message}</td></tr>`;
+        }
+      }
+
+      function openCreateProductModal() {
+        document.getElementById('create-product-modal').style.display = 'flex';
+      }
+      function closeCreateProductModal() {
+        document.getElementById('create-product-modal').style.display = 'none';
+      }
+
+      document.getElementById('create-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const priceNum = parseFloat(document.getElementById('create-prod-price').value);
+        if (isNaN(priceNum) || priceNum <= 0) {
+          AdminApp.showToast('Please enter a valid positive price.', true);
+          return;
+        }
+        const currency = document.getElementById('create-prod-currency').value;
+        const formattedPrice = currency === 'INR'
+          ? `₹${Math.round(priceNum).toLocaleString('en-IN')}`
+          : `$${priceNum.toFixed(2)}`;
+
+        const payload = {
+          id: document.getElementById('create-prod-id').value.trim(),
+          title: document.getElementById('create-prod-title').value.trim(),
+          category: document.getElementById('create-prod-category').value,
+          numericPrice: priceNum,
+          price: formattedPrice,
+          image: document.getElementById('create-prod-image').value.trim() || null,
+          sizes: document.getElementById('create-prod-sizes').value.split(',').map(s => s.trim()).filter(Boolean),
+          desc: document.getElementById('create-prod-desc').value.trim(),
+          in_stock: true
+        };
+
+        try {
+          await AdminApp.apiRequest('/admin/products', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          AdminApp.showToast(`Product '${payload.id}' created with price ${formattedPrice}.`);
+          closeCreateProductModal();
+          document.getElementById('create-product-form').reset();
+          loadProducts();
+          try {
+            localStorage.setItem('atelier_catalog_updated_at', Date.now().toString());
+          } catch(e) {}
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      });
+
+      function openEditProductModal(id) {
+        const prod = catalog.find(p => p.id === id);
+        if (!prod) return;
+
+        document.getElementById('edit-prod-id').value = prod.id;
+        document.getElementById('edit-prod-title').value = prod.title;
+        document.getElementById('edit-prod-price').value = prod.numericPrice;
+
+        const isRupee = (prod.price && prod.price.includes('₹')) || (Number(prod.numericPrice) >= 500);
+        document.getElementById('edit-prod-currency').value = isRupee ? 'INR' : 'USD';
+
+        document.getElementById('edit-prod-stock').value = prod.in_stock ? 'true' : 'false';
+        document.getElementById('edit-prod-desc').value = prod.desc || '';
+        document.getElementById('edit-modal-title').textContent = `Edit Product — ${prod.id}`;
+        document.getElementById('edit-product-modal').style.display = 'flex';
+      }
+      function closeEditProductModal() {
+        document.getElementById('edit-product-modal').style.display = 'none';
+      }
+
+      document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit-prod-id').value;
+        const priceNum = parseFloat(document.getElementById('edit-prod-price').value);
+        if (isNaN(priceNum) || priceNum <= 0) {
+          AdminApp.showToast('Please enter a valid positive price.', true);
+          return;
+        }
+
+        const currency = document.getElementById('edit-prod-currency').value;
+        const formattedPrice = currency === 'INR'
+          ? `₹${Math.round(priceNum).toLocaleString('en-IN')}`
+          : `$${priceNum.toFixed(2)}`;
+
+        const payload = {
+          title: document.getElementById('edit-prod-title').value.trim(),
+          numericPrice: priceNum,
+          price: formattedPrice,
+          in_stock: document.getElementById('edit-prod-stock').value === 'true',
+          desc: document.getElementById('edit-prod-desc').value.trim()
+        };
+
+        try {
+          await AdminApp.apiRequest(`/admin/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(payload)
+          });
+          AdminApp.showToast(`Product '${id}' price updated to ${formattedPrice}.`);
+          closeEditProductModal();
+          loadProducts();
+          try {
+            localStorage.setItem('atelier_catalog_updated_at', Date.now().toString());
+          } catch(e) {}
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      });
+
+      async function deleteProduct(id) {
+        if (!confirm(`Are you sure you want to delete product '${id}' from the catalog?`)) return;
+        try {
+          await AdminApp.apiRequest(`/admin/products/${id}`, { method: 'DELETE' });
+          AdminApp.showToast(`Product '${id}' deleted.`);
+          loadProducts();
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadProducts;
+    </script>
+  </body>
+</html>

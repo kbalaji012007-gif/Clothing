@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Executive Overview — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link active"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Executive Operations Dashboard</div>
+        <div class="topbar-actions">
+          <a href="/" target="_blank" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ↗ Open Storefront
+          </a>
+          <button onclick="loadDashboardData()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh Metrics
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <!-- Metrics Grid (8 Real Firestore Statistics) -->
+        <div class="metrics-grid">
+          <!-- Total Revenue -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Total Revenue</span>
+              <span style="color: var(--admin-accent-gold);">● Verified</span>
+            </div>
+            <div id="metric-revenue" class="metric-value">$0.00</div>
+            <div id="metric-revenue-inr" class="metric-sub">₹0.00 INR</div>
+          </div>
+
+          <!-- Total Orders -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Total Orders</span>
+              <span style="color: var(--admin-info);">All Time</span>
+            </div>
+            <div id="metric-orders" class="metric-value">0</div>
+            <div class="metric-sub">Confirmed & processing</div>
+          </div>
+
+          <!-- Total Customers -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Registered Clients</span>
+              <span style="color: var(--admin-success);">Active</span>
+            </div>
+            <div id="metric-customers" class="metric-value">0</div>
+            <div class="metric-sub">VIP & standard members</div>
+          </div>
+
+          <!-- Pending Orders -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Pending Review</span>
+              <span style="color: var(--admin-warning);">Action Req.</span>
+            </div>
+            <div id="metric-pending" class="metric-value" style="color: var(--admin-warning);">0</div>
+            <div class="metric-sub">Awaiting confirmation</div>
+          </div>
+
+          <!-- Successful Payments -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Successful Payments</span>
+              <span style="color: var(--admin-success);">Cleared</span>
+            </div>
+            <div id="metric-successful-payments" class="metric-value" style="color: var(--admin-success);">0</div>
+            <div class="metric-sub">UPI & Member Card</div>
+          </div>
+
+          <!-- Failed Payments -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Failed Payments</span>
+              <span style="color: var(--admin-danger);">Alert</span>
+            </div>
+            <div id="metric-failed-payments" class="metric-value" style="color: var(--admin-danger);">0</div>
+            <div class="metric-sub">Rejections & timeouts</div>
+          </div>
+
+          <!-- Refund Requests -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Refund Requests</span>
+              <span style="color: #f472b6;">Treasury</span>
+            </div>
+            <div id="metric-refund-requests" class="metric-value" style="color: #f472b6;">0</div>
+            <div class="metric-sub">Customer claims</div>
+          </div>
+
+          <!-- Low Stock Products -->
+          <div class="metric-card">
+            <div class="metric-label">
+              <span>Low-Stock Alerts</span>
+              <span style="color: var(--admin-warning);">Stock</span>
+            </div>
+            <div id="metric-low-stock" class="metric-value">0</div>
+            <div class="metric-sub">Critical inventory items</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders Panel -->
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Recent Customer Orders</h2>
+              <p class="panel-desc">Real-time incoming orders from Sneaker Orbit, Clothing Rack, and Runway.</p>
+            </div>
+            <a href="/admin/orders.html" class="admin-btn admin-btn-secondary admin-btn-sm">
+              Manage All Orders →
+            </a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Payment</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Placed At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr>
+                  <td colspan="7" style="text-align: center; color: var(--admin-text-muted); padding: 32px;">Loading live database records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Activity Logs Panel -->
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Administrative Audit Trail</h2>
+              <p class="panel-desc">Security events, order mutations, and payment verification actions.</p>
+            </div>
+            <a href="/admin/settings.html" class="admin-btn admin-btn-secondary admin-btn-sm">View Full Log</a>
+          </div>
+
+          <div id="activity-logs-container">
+            <div style="color: var(--admin-text-muted); font-size: 13px;">Loading audit logs...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      async function loadDashboardData() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        try {
+          const res = await AdminApp.apiRequest('/admin/overview');
+          const m = res.metrics;
+
+          document.getElementById('metric-revenue').textContent = `$${m.total_revenue_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+          document.getElementById('metric-revenue-inr').textContent = `₹${m.total_revenue_inr.toLocaleString('en-IN', { minimumFractionDigits: 2 })} INR`;
+          document.getElementById('metric-orders').textContent = m.total_orders;
+          document.getElementById('metric-customers').textContent = m.total_customers;
+          document.getElementById('metric-pending').textContent = m.pending_orders;
+          document.getElementById('metric-successful-payments').textContent = m.successful_payments;
+          document.getElementById('metric-failed-payments').textContent = m.failed_payments;
+          document.getElementById('metric-refund-requests').textContent = m.refund_requests;
+          document.getElementById('metric-low-stock').textContent = m.low_stock_products;
+
+          // Render Recent Orders
+          const tbody = document.getElementById('orders-tbody');
+          if (!res.recent_orders || res.recent_orders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--admin-text-muted); padding: 24px;">No orders found in database.</td></tr>`;
+          } else {
+            tbody.innerHTML = res.recent_orders.map(o => {
+              const dateStr = new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+              const pillClass = `pill-${o.status.toLowerCase()}`;
+              return `
+                <tr>
+                  <td style="font-family: monospace; font-weight: 700; color: #fff;">${o.id}</td>
+                  <td>
+                    <div style="font-weight: 600;">${o.customer_name}</div>
+                    <div style="font-size: 11px; color: var(--admin-text-muted);">${o.customer_email}</div>
+                  </td>
+                  <td>
+                    <div style="font-size: 12px;">${o.payment_method}</div>
+                    <div style="font-size: 10px; color: var(--admin-text-muted);">${o.payment_status || 'CONFIRMED'}</div>
+                  </td>
+                  <td style="font-weight: 700; color: #fff;">$${Number(o.total).toFixed(2)}</td>
+                  <td><span class="status-pill ${pillClass}">${o.status}</span></td>
+                  <td style="color: var(--admin-text-muted); font-size: 12px;">${dateStr}</td>
+                  <td>
+                    <a href="/admin/orders.html?id=${o.id}" class="admin-btn admin-btn-secondary admin-btn-sm">
+                      Inspect & Fulfill
+                    </a>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+
+          // Render Logs
+          const logContainer = document.getElementById('activity-logs-container');
+          if (!res.recent_logs || res.recent_logs.length === 0) {
+            logContainer.innerHTML = `<div style="color: var(--admin-text-muted); font-size: 13px;">No recent administrative events recorded.</div>`;
+          } else {
+            logContainer.innerHTML = res.recent_logs.map(l => `
+              <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--admin-border-subtle); font-size: 13px;">
+                <div>
+                  <strong style="color: #fff;">${l.action}</strong>
+                  <div style="font-size: 11px; color: var(--admin-text-muted);">Executed by: ${l.admin_email}</div>
+                </div>
+                <div style="color: var(--admin-text-dim); font-size: 11px;">
+                  ${new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </div>
+              </div>
+            `).join('');
+          }
+
+        } catch (err) {
+          AdminApp.showToast(err.message, true);
+        }
+      }
+
+      window.onload = loadDashboardData;
+    </script>
+  </body>
+</html>

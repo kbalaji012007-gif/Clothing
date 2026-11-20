@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Customer Directory — Atelier Administration</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span class="brand-text">ATELIER</span>
+        <span class="admin-badge">HQ ADMIN</span>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="/admin/dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Overview</a></li>
+        <li><a href="/admin/orders.html" class="nav-link"><span class="nav-icon">📦</span> Orders</a></li>
+        <li><a href="/admin/products.html" class="nav-link"><span class="nav-icon">🏷</span> Products</a></li>
+        <li><a href="/admin/customers.html" class="nav-link active"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="/admin/payments.html" class="nav-link"><span class="nav-icon">⚡</span> Payments & UTR</a></li>
+        <li><a href="/admin/inventory.html" class="nav-link"><span class="nav-icon">📋</span> Inventory</a></li>
+        <li><a href="/admin/analytics.html" class="nav-link"><span class="nav-icon">📈</span> Analytics</a></li>
+        <li><a href="/admin/settings.html" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-card">
+          <div id="admin-profile-avatar" class="admin-user-avatar">AD</div>
+          <div class="admin-user-info">
+            <div id="admin-profile-name" class="admin-user-name">Loading...</div>
+            <div id="admin-profile-role" class="admin-user-role">Master Admin</div>
+          </div>
+        </div>
+        <a href="#" id="admin-logout-btn" class="nav-link" style="color: var(--admin-danger);"><span class="nav-icon">🚪</span> Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">Customer Relationship Directory</div>
+        <div class="topbar-actions">
+          <button onclick="loadCustomers()" class="admin-btn admin-btn-secondary admin-btn-sm">
+            ⟳ Refresh
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Registered Clientele</h2>
+              <p class="panel-desc">All registered shoppers, order volumes, and lifetime value.</p>
+            </div>
+            <div>
+              <input type="text" id="cust-search" class="filter-input" placeholder="Search by name or email..." oninput="filterCustomers()" />
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Contact Email & Phone</th>
+                  <th>Total Orders</th>
+                  <th>Lifetime Spend</th>
+                  <th>Privilege Tier</th>
+                  <th>Joined Date</th>
+                </tr>
+              </thead>
+              <tbody id="customers-table-body">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 36px;">Loading customers...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+    <script>
+      let customers = [];
+
+      async function loadCustomers() {
+        if (!AdminApp.requireAdmin()) return;
+        AdminApp.initSidebar();
+
+        const tbody = document.getElementById('customers-table-body');
+        try {
+          customers = await AdminApp.apiRequest('/admin/customers');
+          renderCustomers(customers);
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color: var(--admin-danger); text-align: center; padding: 24px;">Failed to load customers: ${err.message}</td></tr>`;
+        }
+      }
+
+      function renderCustomers(list) {
+        const tbody = document.getElementById('customers-table-body');
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 32px;">No customers registered yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(c => {
+          const dateStr = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const isVip = c.tier === 'VIP';
+          return `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${c.name}</div>
+                <div style="font-size: 11px; color: var(--admin-text-muted); font-family: monospace;">ID: ${c.user_id}</div>
+              </td>
+              <td>
+                <div>${c.email}</div>
+                <div style="font-size: 11px; color: var(--admin-text-muted);">${c.phone || 'No phone recorded'}</div>
+              </td>
+              <td style="font-weight: 600;">${c.orders_count} order${c.orders_count === 1 ? '' : 's'}</td>
+              <td style="font-weight: 700; color: #fff;">$${Number(c.total_spent).toFixed(2)}</td>
+              <td>
+                <span class="status-pill ${isVip ? 'pill-confirmed' : 'pill-shipped'}">
+                  ${isVip ? '★ VIP Patron' : 'Client Member'}
+                </span>
+              </td>
+              <td style="color: var(--admin-text-muted); font-size: 12px;">${dateStr}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function filterCustomers() {
+        const q = document.getElementById('cust-search').value.toLowerCase().trim();
+        if (!q) {
+          renderCustomers(customers);
+          return;
+        }
+        const filtered = customers.filter(c => 
+          (c.name && c.name.toLowerCase().includes(q)) || 
+          (c.email && c.email.toLowerCase().includes(q))
+        );
+        renderCustomers(filtered);
+      }
+
+      window.onload = loadCustomers;
+    </script>
+  </body>
+</html>
