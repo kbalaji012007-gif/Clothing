@@ -250,9 +250,28 @@
 
   function updateCounters() {
     const total = bagEntries.reduce((sum, e) => sum + (Number(e.quantity) || 1), 0);
+    const countStr = String(total);
+
+    // Update all [data-cart-count] badges (header bag icon)
     document.querySelectorAll('[data-cart-count]').forEach((el) => {
-      el.textContent = String(total);
+      el.textContent = countStr;
+      // Hide badge when empty, show with pop when items exist
+      if (total === 0) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'flex';
+        el.classList.remove('badge-pop');
+        // Force reflow to re-trigger animation
+        void el.offsetWidth;
+        el.classList.add('badge-pop');
+      }
     });
+
+    // Also sync the popover-cart-badge (member profile popover)
+    const popoverBadge = document.getElementById('popover-cart-badge');
+    if (popoverBadge) {
+      popoverBadge.textContent = countStr;
+    }
   }
 
   function showToast(text) {
