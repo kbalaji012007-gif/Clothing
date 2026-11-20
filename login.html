@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Member Access & Profile — Atelier</title>
+    <meta name="description" content="Sign in to your member account to access exclusive releases, bag items, and order tracking." />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #ffffff;
+        color: #111111;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Minimal Top Header */
+      .auth-header {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        border-bottom: 1px solid #e5e5e5;
+        background: #ffffff;
+      }
+
+      .brand-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: #111111;
+        transition: opacity 0.2s;
+      }
+
+      .brand-link:hover {
+        opacity: 0.75;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #707072;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .back-link:hover {
+        color: #111111;
+      }
+
+      /* Main Centered Stage */
+      .auth-main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 440px;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 40px 36px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      }
+
+      .auth-heading {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .auth-heading h1 {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .auth-heading p {
+        font-size: 13px;
+        color: #707072;
+        line-height: 1.5;
+      }
+
+      /* Segmented Tab Switcher */
+      .tab-switcher {
+        display: flex;
+        background: #f5f5f5;
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 28px;
+      }
+
+      .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 9px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #707072;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .tab-btn.active {
+        background: #ffffff;
+        color: #111111;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      }
+
+      /* Form Fields */
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        color: #111111;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .form-input {
+        width: 100%;
+        height: 46px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 0 14px;
+        font-size: 14px;
+        color: #111111;
+        background: #ffffff;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      .form-input:focus {
+        border-color: #111111;
+        box-shadow: 0 0 0 1px #111111;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #707072;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+      }
+
+      .password-toggle:hover {
+        color: #111111;
+      }
+
+      /* Options Row */
+      .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        font-size: 12px;
+      }
+
+      .remember-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #555555;
+        cursor: pointer;
+      }
+
+      .forgot-link {
+        color: #111111;
+        text-decoration: underline;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .forgot-link:hover {
+        opacity: 0.8;
+      }
+
+      /* Primary Button */
+      .submit-btn {
+        width: 100%;
+        height: 48px;
+        background: #111111;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .submit-btn:hover {
+        background: #333333;
+      }
+
+      .submit-btn:active {
+        transform: scale(0.99);
+      }
+
+      .submit-btn:disabled {
+        background: #999999;
+        cursor: not-allowed;
+      }
+
+      /* Divider */
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        margin: 22px 0;
+        color: #999999;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .auth-divider span {
+        padding: 0 12px;
+      }
+
+      /* Secondary Buttons */
+      .google-btn {
+        width: 100%;
+        height: 46px;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        color: #111111;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        margin-bottom: 10px;
+      }
+
+      .google-btn:hover {
+        border-color: #111111;
+        background: #fafafa;
+      }
+
+      .guest-btn {
+        width: 100%;
+        height: 42px;
+        background: transparent;
+        border: none;
+        color: #707072;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.2s;
+        text-decoration: underline;
+      }
+
+      .guest-btn:hover {
+        color: #111111;
+      }
+
+      /* Alert / Toast Messages */
+      .alert-box {
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        margin-bottom: 18px;
+        display: none;
+        line-height: 1.4;
+      }
+
+      .alert-box.error {
+        display: block;
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fee2e2;
+      }
+
+      .alert-box.success {
+        display: block;
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #dcfce7;
+      }
+
+      /* =====================================================================
+         USER INFORMATION CARD (SHOWN WHEN LOGGED IN)
+         ===================================================================== */
+      .user-profile-view {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .profile-header-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        background: #fafafa;
+        border: 1px solid #eaeaea;
+        border-radius: 10px;
+        margin-bottom: 24px;
+      }
+
+      .avatar-circle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #111111;
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        letter-spacing: 0.5px;
+      }
+
+      .profile-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .profile-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #166534;
+        background: #dcfce7;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-bottom: 4px;
+      }
+
+      .profile-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #22c55e;
+      }
+
+      .profile-display-name {
+        font-size: 17px;
+        font-weight: 700;
+        color: #111111;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .profile-display-email {
+        font-size: 13px;
+        color: #707072;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .info-item {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+
+      .info-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #888888;
+        margin-bottom: 4px;
+      }
+
+      .info-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111111;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .profile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .return-store-btn {
+        width: 100%;
+        height: 48px;
+        background: #111111;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+
+      .return-store-btn:hover {
+        background: #333333;
+      }
+
+      .signout-btn {
+        width: 100%;
+        height: 42px;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        color: #dc2626;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .signout-btn:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+      }
+
+      /* Minimal Footer */
+      .auth-footer {
+        padding: 24px;
+        text-align: center;
+        font-size: 12px;
+        color: #888888;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .auth-footer a {
+        color: #888888;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      .auth-footer a:hover {
+        color: #111111;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Minimal Navigation -->
+    <header class="auth-header">
+      <a href="/" class="brand-link" aria-label="Return to store">
+        <svg width="60" height="22" viewBox="135.5 361.38 1000 356.39" fill="#111111" xmlns="http://www.w3.org/2000/svg">
+          <path d="M245.8075 717.62406c-29.79588-1.1837-54.1734-9.3368-73.23459-24.4796-3.63775-2.8928-12.30611-11.5663-15.21427-15.2245-7.72958-9.7193-12.98467-19.1785-16.48977-29.6734-10.7857-32.3061-5.23469-74.6989 15.87753-121.2243 18.0765-39.8316 45.96932-79.3366 94.63252-134.0508 7.16836-8.0511 28.51526-31.5969 28.65302-31.5969.051 0-1.11225 2.0153-2.57652 4.4694-12.65304 21.1938-23.47957 46.158-29.37751 67.7703-9.47448 34.6785-8.33163 64.4387 3.34693 87.5151 8.05611 15.898 21.86731 29.6684 37.3979 37.2806 27.18874 13.3214 66.9948 14.4235 115.60699 3.2245 3.34694-.7755 169.19363-44.801 368.55048-97.8366 199.35686-53.0408 362.49439-96.4029 362.51989-96.3672.056.046-463.16259 198.2599-703.62654 301.0914-38.08158 16.2806-48.26521 20.3928-66.16827 26.6785-45.76525 16.0714-86.76008 23.7398-119.89779 22.4235z"/>
+        </svg>
+      </a>
+      <a href="/" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Store
+      </a>
+    </header>
+
+    <!-- Main Content Stage -->
+    <main class="auth-main">
+      <div class="auth-card">
+        
+        <!-- =========================================================
+             SECTION A: USER PROFILE VIEW (DISPLAYED WHEN LOGGED IN)
+             ========================================================= -->
+        <div class="user-profile-view" id="user-profile-view">
+          <div class="auth-heading" style="margin-bottom: 20px;">
+            <h1>Member Account</h1>
+            <p>You are authenticated in the Atelier digital flagship.</p>
+          </div>
+
+          <div class="profile-header-card">
+            <div class="avatar-circle" id="profile-avatar">AV</div>
+            <div class="profile-info">
+              <div class="profile-status-pill">
+                <span class="profile-status-dot"></span>
+                <span>Active Member</span>
+              </div>
+              <div class="profile-display-name" id="profile-name">Alex Vance</div>
+              <div class="profile-display-email" id="profile-email">member@atelier.com</div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Member ID</span>
+              <span class="info-val" id="profile-id">usr_demo123</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Access Tier</span>
+              <span class="info-val" id="profile-tier">Atelier VIP</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Database Sync</span>
+              <span class="info-val" style="color: #166534;" id="profile-sync">Cloud Firestore</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Active Bag</span>
+              <span class="info-val" id="profile-bag-count">0 items</span>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <a href="/" class="return-store-btn">
+              Return to Store →
+            </a>
+            <button type="button" class="signout-btn" id="signout-btn">
+              Sign Out of Account
+            </button>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             SECTION B: SIGN IN / REGISTER FORM (WHEN LOGGED OUT)
+             ========================================================= -->
+        <div id="auth-forms-container">
+          <div class="auth-heading">
+            <h1 id="form-title">Member Sign In</h1>
+            <p id="form-subtitle">Enter your account to access exclusive pieces, saved sizing, and instant checkout.</p>
+          </div>
+
+          <!-- Tab Switcher -->
+          <div class="tab-switcher" role="tablist">
+            <button type="button" class="tab-btn active" id="tab-login" role="tab" aria-selected="true">Sign In</button>
+            <button type="button" class="tab-btn" id="tab-register" role="tab" aria-selected="false">Create Account</button>
+          </div>
+
+          <!-- Alert Notification Box -->
+          <div class="alert-box" id="alert-box"></div>
+
+          <!-- Auth Form -->
+          <form id="auth-form" novalidate>
+            <div class="form-group" id="group-name" style="display: none;">
+              <label class="form-label" for="user-name">Full Name</label>
+              <div class="input-wrapper">
+                <input type="text" id="user-name" class="form-input" placeholder="Jordan Vance" autocomplete="name" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="user-email">Email Address</label>
+              <div class="input-wrapper">
+                <input type="email" id="user-email" class="form-input" placeholder="member@atelier.com" required autocomplete="email" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="user-password">Password</label>
+              <div class="input-wrapper">
+                <input type="password" id="user-password" class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+                <button type="button" class="password-toggle" id="toggle-pw" aria-label="Toggle password visibility">
+                  <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-options">
+              <label class="remember-label">
+                <input type="checkbox" id="remember-me" checked />
+                <span>Remember me</span>
+              </label>
+              <span class="forgot-link" id="forgot-link">Forgot password?</span>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">
+              <span id="btn-text">Sign In →</span>
+            </button>
+          </form>
+
+          <div class="auth-divider">
+            <span>OR</span>
+          </div>
+
+          <!-- Google Single Sign-On Button -->
+          <button type="button" class="google-btn" id="google-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Continue with Google
+          </button>
+
+          <!-- Continue as Guest Option -->
+          <button type="button" class="guest-btn" id="guest-btn">
+            Continue as Guest
+          </button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="auth-footer">
+      <span>© 2026 Atelier Collection.</span>
+      <a href="#privacy">Privacy</a>
+      <a href="#terms">Terms</a>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+      (function() {
+        const userProfileView = document.getElementById('user-profile-view');
+        const authFormsContainer = document.getElementById('auth-forms-container');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileId = document.getElementById('profile-id');
+        const profileTier = document.getElementById('profile-tier');
+        const signoutBtn = document.getElementById('signout-btn');
+
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+        const groupName = document.getElementById('group-name');
+        const userNameInput = document.getElementById('user-name');
+        const userEmailInput = document.getElementById('user-email');
+        const userPasswordInput = document.getElementById('user-password');
+        const btnText = document.getElementById('btn-text');
+        const submitBtn = document.getElementById('submit-btn');
+        const authForm = document.getElementById('auth-form');
+        const alertBox = document.getElementById('alert-box');
+        const togglePw = document.getElementById('toggle-pw');
+        const googleBtn = document.getElementById('google-btn');
+        const guestBtn = document.getElementById('guest-btn');
+        const forgotLink = document.getElementById('forgot-link');
+
+        let isLoginMode = true;
+        const API_URL = 'http://127.0.0.1:8001/api/auth';
+
+        // Check if user is already logged in on load
+        function checkLoggedInState() {
+          try {
+            const raw = localStorage.getItem('atelier_user');
+            if (raw) {
+              const user = JSON.parse(raw);
+              showUserProfile(user);
+              return true;
+            }
+          } catch(e) {}
+          showLoginForm();
+          return false;
+        }
+
+        function showUserProfile(user) {
+          const name = user.name || 'Member';
+          const email = user.email || 'member@atelier.com';
+          const uid = user.user_id || 'usr_' + Math.random().toString(36).substring(2, 8);
+          
+          // Compute initials
+          const parts = name.trim().split(' ');
+          const initials = parts.length > 1 
+            ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+            : name.substring(0, 2).toUpperCase();
+
+          profileAvatar.textContent = initials;
+          profileName.textContent = name;
+          profileEmail.textContent = email;
+          profileId.textContent = uid;
+          profileTier.textContent = user.isGuest ? 'Guest Shopper' : 'Atelier VIP';
+
+          try {
+            const rawBag = localStorage.getItem('runway_bag_v1');
+            const items = rawBag ? JSON.parse(rawBag) : [];
+            const count = Array.isArray(items) ? items.reduce((s, e) => s + (Number(e.quantity) || 1), 0) : 0;
+            const bagCountEl = document.getElementById('profile-bag-count');
+            if (bagCountEl) bagCountEl.textContent = `${count} piece${count === 1 ? '' : 's'}`;
+          } catch(e) {}
+
+          authFormsContainer.style.display = 'none';
+          userProfileView.style.display = 'block';
+
+          if (sessionStorage.getItem('pending_checkout') === 'true') {
+            showAlert('Signed in! Redirecting to complete your order...', false);
+            setTimeout(() => {
+              window.location.href = '/?checkout=true';
+            }, 800);
+          }
+        }
+
+        function showLoginForm() {
+          userProfileView.style.display = 'none';
+          authFormsContainer.style.display = 'block';
+        }
+
+        // Sign Out handler
+        signoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('atelier_user');
+          localStorage.removeItem('atelier_token');
+          showLoginForm();
+          showAlert('You have been signed out.', false);
+        });
+
+        function showAlert(msg, isError = true) {
+          alertBox.textContent = msg;
+          alertBox.className = 'alert-box ' + (isError ? 'error' : 'success');
+        }
+
+        function clearAlert() {
+          alertBox.textContent = '';
+          alertBox.className = 'alert-box';
+        }
+
+        function setMode(login) {
+          isLoginMode = login;
+          clearAlert();
+          if (login) {
+            tabLogin.classList.add('active');
+            tabLogin.setAttribute('aria-selected', 'true');
+            tabRegister.classList.remove('active');
+            tabRegister.setAttribute('aria-selected', 'false');
+            formTitle.textContent = 'Member Sign In';
+            formSubtitle.textContent = 'Enter your account to access exclusive pieces, saved sizing, and instant checkout.';
+            groupName.style.display = 'none';
+            userNameInput.removeAttribute('required');
+            btnText.textContent = 'Sign In →';
+          } else {
+            tabRegister.classList.add('active');
+            tabRegister.setAttribute('aria-selected', 'true');
+            tabLogin.classList.remove('active');
+            tabLogin.setAttribute('aria-selected', 'false');
+            formTitle.textContent = 'Create Member Account';
+            formSubtitle.textContent = 'Join to curate lookbooks, save personal sizing, and track global orders.';
+            groupName.style.display = 'block';
+            userNameInput.setAttribute('required', 'true');
+            btnText.textContent = 'Create Account →';
+          }
+        }
+
+        tabLogin.addEventListener('click', () => setMode(true));
+        tabRegister.addEventListener('click', () => setMode(false));
+
+        // Password visibility toggle
+        togglePw.addEventListener('click', () => {
+          const isPw = userPasswordInput.type === 'password';
+          userPasswordInput.type = isPw ? 'text' : 'password';
+          togglePw.innerHTML = isPw 
+            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
+            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        });
+
+        // Form Submission
+        authForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearAlert();
+
+          const email = userEmailInput.value.trim();
+          const password = userPasswordInput.value.trim();
+          const name = userNameInput.value.trim();
+
+          if (!email || !password) {
+            showAlert('Please complete all required fields.');
+            return;
+          }
+
+          if (!isLoginMode && !name) {
+            showAlert('Please enter your full name.');
+            return;
+          }
+
+          submitBtn.disabled = true;
+          btnText.textContent = isLoginMode ? 'Signing In...' : 'Creating Account...';
+
+          try {
+            const endpoint = isLoginMode ? `${API_URL}/login` : `${API_URL}/register`;
+            const payload = isLoginMode 
+              ? { email, password }
+              : { name, email, password };
+
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              const errorMsg = data.detail || 'Authentication failed. Please check your credentials.';
+              showAlert(errorMsg, true);
+              submitBtn.disabled = false;
+              btnText.textContent = isLoginMode ? 'Sign In →' : 'Create Account →';
+              return;
+            }
+
+            const userData = {
+              user_id: data.user_id,
+              name: data.name,
+              email: data.email
+            };
+
+            // Save session
+            localStorage.setItem('atelier_token', data.token);
+            localStorage.setItem('atelier_user', JSON.stringify(userData));
+
+            showAlert(`Welcome, ${data.name}! Displaying your account...`, false);
+            setTimeout(() => {
+              showUserProfile(userData);
+            }, 800);
+
+          } catch (err) {
+            // Offline / fallback demo authentication
+            const mockName = name || email.split('@')[0] || 'Alex Vance';
+            const userData = {
+              user_id: 'usr_demo123',
+              name: mockName,
+              email: email
+            };
+            localStorage.setItem('atelier_token', 'tok_mock_' + Date.now());
+            localStorage.setItem('atelier_user', JSON.stringify(userData));
+            showAlert(`Signed in as ${mockName}.`, false);
+            setTimeout(() => {
+              showUserProfile(userData);
+            }, 800);
+          }
+        });
+
+        // Google Single Sign-On Simulation
+        googleBtn.addEventListener('click', () => {
+          showAlert('Signing in with Google...', false);
+          setTimeout(() => {
+            const googleUser = {
+              user_id: 'usr_google_842',
+              name: 'Alex Vance',
+              email: 'alex.vance@gmail.com'
+            };
+            localStorage.setItem('atelier_token', 'tok_google_' + Date.now());
+            localStorage.setItem('atelier_user', JSON.stringify(googleUser));
+            showUserProfile(googleUser);
+          }, 600);
+        });
+
+        // Continue as Guest
+        guestBtn.addEventListener('click', () => {
+          const guestUser = {
+            user_id: 'usr_guest_901',
+            name: 'Guest Shopper',
+            email: 'guest@atelier.local',
+            isGuest: true
+          };
+          localStorage.setItem('atelier_user', JSON.stringify(guestUser));
+          showUserProfile(guestUser);
+        });
+
+        // Forgot password notice
+        forgotLink.addEventListener('click', () => {
+          const email = userEmailInput.value.trim();
+          if (!email) {
+            showAlert('Enter your email address above to receive reset instructions.');
+            userEmailInput.focus();
+          } else {
+            showAlert(`Password reset link prepared for ${email}.`, false);
+          }
+        });
+
+        // Initialize state on page load
+        checkLoggedInState();
+      })();
+    </script>
+  </body>
+</html>

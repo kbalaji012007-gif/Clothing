@@ -1,0 +1,409 @@
+/* ==========================================================================
+   HAND RAIL SECTION — TEES & JERSEYS (BOYS' STREETWEAR)
+   ========================================================================== */
+
+.rail-section {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(180deg, #edf0f4 0%, #e6e9ee 100%);
+  padding: 60px 0 90px;
+  overflow: hidden;
+  border-top: 1px solid #dcdfe4;
+  border-bottom: 1px solid #dcdfe4;
+  font-family: inherit;
+  color: #111111;
+  user-select: none;
+}
+
+.rail-head {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.rail-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rail-badge {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #0b0b0b;
+  background: #ffffff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.rail-divider {
+  color: #a0a6b1;
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.rail-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #555b66;
+}
+
+.rail-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: #888e99;
+}
+
+/* Rail Track Container */
+.rail-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-behavior: smooth;
+  cursor: grab;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 40px 0 60px;
+}
+
+.rail-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.rail-viewport:active {
+  cursor: grabbing;
+}
+
+.rail-track-outer {
+  position: relative;
+  min-width: 100%;
+  width: max-content;
+  padding: 0 80px;
+}
+
+/* Physical Metal Pipe & Wall Brackets */
+.rail-pipe-assembly {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rail-bracket-left,
+.rail-bracket-right {
+  position: absolute;
+  top: -6px;
+  width: 32px;
+  height: 30px;
+  background: linear-gradient(180deg, #999da4 0%, #6f747c 50%, #4f5359 100%);
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 7;
+}
+
+.rail-bracket-left { left: 40px; }
+.rail-bracket-right { right: 40px; }
+
+.rail-pipe {
+  position: absolute;
+  left: 45px;
+  right: 45px;
+  top: 0;
+  height: 16px;
+  background: linear-gradient(
+    180deg,
+    #cfd3d8 0%,
+    #f2f4f7 30%,
+    #e1e4e8 50%,
+    #9ba1aa 85%,
+    #6d727b 100%
+  );
+  border-radius: 8px;
+  box-shadow: 
+    0 1px 2px rgba(255,255,255,0.8) inset,
+    0 6px 12px rgba(0, 0, 0, 0.18),
+    0 14px 28px rgba(0, 0, 0, 0.08);
+}
+
+/* Clothes Row */
+.rail-items {
+  display: flex;
+  align-items: flex-start;
+  gap: 55px;
+  padding-top: 10px;
+  z-index: 6;
+  position: relative;
+}
+
+/* Individual Hanging Piece */
+.rail-piece {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+}
+
+.rail-piece:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.rail-piece.is-swaying {
+  animation: naturalSway 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes naturalSway {
+  0% { transform: rotate(-1.4deg); }
+  50% { transform: rotate(1.2deg); }
+  100% { transform: rotate(-1.4deg); }
+}
+
+/* Metal Hook */
+.rail-hook {
+  width: 20px;
+  height: 48px;
+  position: relative;
+  margin-bottom: -10px;
+  z-index: 4;
+}
+
+.rail-hook svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* Hanging Price Tag */
+.rail-tag {
+  position: absolute;
+  top: 28px;
+  left: 65%;
+  background: #ffffff;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #d8d8d8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  z-index: 8;
+  transform: rotate(4deg);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.rail-piece:hover .rail-tag {
+  transform: rotate(0deg) scale(1.08);
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+/* Garment Display */
+.rail-garment {
+  position: relative;
+  width: 220px;
+  height: 290px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.16));
+  transition: filter 0.3s ease;
+}
+
+.rail-piece:hover .rail-garment {
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.24));
+}
+
+.rail-garment svg,
+.rail-garment img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Label Below Piece */
+.rail-meta {
+  margin-top: 18px;
+  text-align: center;
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+
+.rail-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #111111;
+  text-transform: uppercase;
+}
+
+.rail-category {
+  font-size: 11px;
+  color: #6c727e;
+  margin-top: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rail-quick-add {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111111;
+  background: #ffffff;
+  border: 1px solid #111111;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.25s ease;
+}
+
+.rail-piece:hover .rail-quick-add {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rail-quick-add:hover {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* Controls */
+.rail-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.rail-btn-nav {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #d4d8df;
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.rail-btn-nav:hover {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  transform: scale(1.05);
+}
+
+/* Size Modal for Quick Add */
+.rail-modal {
+  border: none;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  font-family: inherit;
+  margin: auto;
+}
+
+.rail-modal::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.rail-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.rail-modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.rail-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.rail-modal-body {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.rail-modal-img {
+  width: 100px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.rail-modal-sizes {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.rail-size-btn {
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rail-size-btn.is-active,
+.rail-size-btn:hover {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+.rail-btn-confirm {
+  width: 100%;
+  padding: 12px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s ease;
+}
+
+.rail-btn-confirm:hover {
+  background: #333333;
+}

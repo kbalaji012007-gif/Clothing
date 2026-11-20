@@ -1,0 +1,217 @@
+INITIAL_SEED_PRODUCTS = [
+    # --- Sneaker Orbit Showcase ---
+    {
+        "id": "luka-5",
+        "title": "LUKA 5",
+        "name": "LUKA 5",
+        "subtitle": "Jordan Brand · Space Minimalist",
+        "category": "sneakers",
+        "price": "$149.00",
+        "numericPrice": 149.0,
+        "image": "/assets/sneakers/sneaker-1.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Engineered for rapid step-backs and directional shifts with IsoPlate stability and full-length Cushlon 3.0 foam."
+    },
+    {
+        "id": "tatum-5-orbit",
+        "title": "TATUM 5 ORBIT",
+        "name": "TATUM 5 ORBIT",
+        "subtitle": "Jordan Performance · Ultra-Lightweight",
+        "category": "sneakers",
+        "price": "$149.00",
+        "numericPrice": 149.0,
+        "image": "/assets/sneakers/sneaker-2.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Lightest performance shoe in the lineup featuring collapsible heel and forefoot Zoom Air responsiveness."
+    },
+    {
+        "id": "air-jordan-12-retro",
+        "title": "AIR JORDAN 12 RETRO",
+        "name": "AIR JORDAN 12 RETRO",
+        "subtitle": "Heritage Court · Full-Length Zoom",
+        "category": "sneakers",
+        "price": "$200.00",
+        "numericPrice": 200.0,
+        "image": "/assets/sneakers/sneaker-3.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Premium full-grain leather upper with radiant stitching lines and full-length Zoom Air cushioning."
+    },
+    {
+        "id": "air-jordan-xxxix",
+        "title": "AIR JORDAN XXXIX",
+        "name": "AIR JORDAN XXXIX",
+        "subtitle": "Premier Signature · ZoomX Foam",
+        "category": "sneakers",
+        "price": "$200.00",
+        "numericPrice": 200.0,
+        "image": "/assets/sneakers/sneaker-4.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Next-generation basketball architecture merging full-length ZoomX foam with herringbone traction."
+    },
+    {
+        "id": "gt-cut-3-turbo",
+        "title": "G.T. CUT 3 TURBO",
+        "name": "G.T. CUT 3 TURBO",
+        "subtitle": "Nike Basketball · Speed System",
+        "category": "sneakers",
+        "price": "$190.00",
+        "numericPrice": 190.0,
+        "image": "/assets/sneakers/sneaker-5.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Maximum stop-and-go responsiveness with high-energy ZoomX responsive foam."
+    },
+    {
+        "id": "air-max-dn-se",
+        "title": "AIR MAX DN SE",
+        "name": "AIR MAX DN SE",
+        "subtitle": "Dynamic Air · Multi-Chamber Comfort",
+        "category": "sneakers",
+        "price": "$160.00",
+        "numericPrice": 160.0,
+        "image": "/assets/sneakers/sneaker-6.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Features the Dynamic Air tube system of dual-pressure chambers for a fluid bounce with every stride."
+    },
+    {
+        "id": "sabrina-2-relic",
+        "title": "SABRINA 2 RELIC",
+        "name": "SABRINA 2 RELIC",
+        "subtitle": "Signature Precision · Cushlon Core",
+        "category": "sneakers",
+        "price": "$130.00",
+        "numericPrice": 130.0,
+        "image": "/assets/sneakers/sneaker-7.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Snug midfoot lockdown meets sticky multi-directional court traction."
+    },
+    {
+        "id": "ja-2-heartbreak",
+        "title": "JA 2 HEARTBREAK",
+        "name": "JA 2 HEARTBREAK",
+        "subtitle": "Explosive Energy · Forefoot Zoom",
+        "category": "sneakers",
+        "price": "$120.00",
+        "numericPrice": 120.0,
+        "image": "/assets/sneakers/sneaker-8.webp",
+        "sizes": ["40", "41", "42", "43", "44", "45", "46"],
+        "desc": "Air Zoom forefoot unit delivers high-energy liftoffs and quick changes of pace."
+    },
+
+    # --- 3D Clothing Rack Products ---
+    {
+        "id": "rack-blazer-navy-1",
+        "title": "Tailored Navy Wool Blazer",
+        "subtitle": "Midnight Navy",
+        "category": "rack",
+        "price": "$199.00",
+        "numericPrice": 199.0,
+        "tag": "$199",
+        "frontImage": "/assets/hoodies/jacket-navy.png",
+        "sideImage": "/assets/hoodies/jacket-navy-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Structured wool blend tailored blazer featuring padded shoulders, notch lapel profile, kissing button cuffs, and a vented back."
+    },
+    {
+        "id": "rack-hoodie-grey-1",
+        "title": "Graphic Archive Hoodie",
+        "subtitle": "Heather Grey · 480 GSM",
+        "category": "rack",
+        "price": "$149.00",
+        "numericPrice": 149.0,
+        "tag": "$149",
+        "frontImage": "/assets/hoodies/hoodie-grey.png",
+        "sideImage": "/assets/hoodies/hoodie-grey-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Heavyweight French terry pullover with custom chest typography, double-needle coverstitch hems, and a relaxed boxy drape."
+    },
+    {
+        "id": "rack-hoodie-black-1",
+        "title": "Heavyweight Core Hoodie",
+        "subtitle": "Washed Black · 520 GSM",
+        "category": "rack",
+        "price": "$169.00",
+        "numericPrice": 169.0,
+        "tag": "$169",
+        "frontImage": "/assets/hoodies/hoodie-black.png",
+        "sideImage": "/assets/hoodies/hoodie-black-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Oversized silhouette cut from 520 GSM loopback cotton. Thick ribbed cuffs, seamless side panels, and lined hood."
+    },
+    {
+        "id": "rack-hoodie-cream-1",
+        "title": "Premium Fleece Pullover",
+        "subtitle": "Ecru / Cream · Brushed Interior",
+        "category": "rack",
+        "price": "$159.00",
+        "numericPrice": 159.0,
+        "tag": "$159",
+        "frontImage": "/assets/hoodies/hoodie-cream.png",
+        "sideImage": "/assets/hoodies/hoodie-cream-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Minimalist staple in warm ecru fleece with clean kangaroo pouch and tonal embroidered hardware."
+    },
+    {
+        "id": "rack-hoodie-forest-1",
+        "title": "Oversized Street Hoodie",
+        "subtitle": "Forest Green · Heavy Terry",
+        "category": "rack",
+        "price": "$159.00",
+        "numericPrice": 159.0,
+        "tag": "$159",
+        "frontImage": "/assets/hoodies/hoodie-forest.png",
+        "sideImage": "/assets/hoodies/hoodie-forest-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Deep earth tone hoodie with drop shoulders, clean rib finish, and garment-dyed treatment for long-lasting hue."
+    },
+    {
+        "id": "rack-crew-ash-1",
+        "title": "Minimalist Heavy Crewneck",
+        "subtitle": "Ash Melange · 460 GSM",
+        "category": "rack",
+        "price": "$139.00",
+        "numericPrice": 139.0,
+        "tag": "$139",
+        "frontImage": "/assets/hoodies/crewneck-grey.png",
+        "sideImage": "/assets/hoodies/crewneck-grey-side.png",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Ultra-clean collar construction, custom woven label, and pre-shrunk combed cotton jersey for enduring shape."
+    },
+
+    # --- Runway Collection Pieces ---
+    {
+        "id": "runway-tshirt",
+        "title": "Runway Minimalist Tee",
+        "name": "Tshirt",
+        "subtitle": "Look 1 Foundation",
+        "category": "runway",
+        "price": "$55.00",
+        "numericPrice": 55.0,
+        "image": "https://reel-ref-try-the-look.vercel.app/assets/model-1-640.webp",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Everyday premium heavyweight tee with drop-shoulder cut and bound rib collar."
+    },
+    {
+        "id": "runway-sweatshirt",
+        "title": "Runway Raglan Sweatshirt",
+        "name": "Sweatshirt",
+        "subtitle": "Look 2 Layering",
+        "category": "runway",
+        "price": "$120.00",
+        "numericPrice": 120.0,
+        "image": "https://reel-ref-try-the-look.vercel.app/assets/model-2-640.webp",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Raglan sleeve sweatshirt in brushed organic cotton with flatlock seams."
+    },
+    {
+        "id": "runway-sweatshirt-plus",
+        "title": "Runway Oversized Sweatshirt Plus",
+        "name": "Sweatshirt Plus",
+        "subtitle": "Look 4 Relaxed Cut",
+        "category": "runway",
+        "price": "$135.00",
+        "numericPrice": 135.0,
+        "image": "https://reel-ref-try-the-look.vercel.app/assets/model-4-640.webp",
+        "sizes": ["S", "M", "L", "XL"],
+        "desc": "Wide-body silhouette with dropped armholes, elongated sleeves, and raw cuff finishing."
+    }
+]

@@ -1,0 +1,1187 @@
+/* ==========================================================================
+   NIKEY MEGA STORE - ALL SCREENS STYLES
+   - Top Utility & Global Header
+   - Hand Rail Pro Section (Screen 1 & 2)
+   - Nike Orbit Section (Screen 3)
+   ========================================================================== */
+
+/* --- Main Global Header --- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.site-header .brand svg,
+.site-header .brand img {
+  display: block;
+  height: 22px;
+  width: auto;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.main-nav a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+  letter-spacing: -0.01em;
+  position: relative;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.is-active {
+  color: #000000;
+}
+
+.main-nav a.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #000000;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.search-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5f5f5;
+  border-radius: 24px;
+  padding: 7px 16px;
+  width: 170px;
+  transition: width 0.3s ease, background 0.2s ease;
+}
+
+.search-pill:focus-within {
+  width: 220px;
+  background: #eaeaea;
+}
+
+.search-pill input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: #111111;
+  width: 100%;
+}
+
+.search-pill input::placeholder {
+  color: #707072;
+}
+
+.header-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.header-icon-btn:hover {
+  background: #f0f0f0;
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   HAND RAIL PRO SECTION (Screens 1 & 2)
+   ========================================================================== */
+.section-rail {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  padding: 70px 0 90px;
+  overflow: hidden;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.rail-heading-group {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.rail-badge-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.rail-badge-bold {
+  font-weight: 800;
+  color: #111111;
+}
+
+.rail-badge-divider {
+  color: #bbbbbb;
+}
+
+.rail-badge-light {
+  font-weight: 500;
+  color: #777777;
+}
+
+/* ==========================================================================
+   INTERACTIVE HORIZONTAL CLOTHING RACK SHOWCASE
+   ========================================================================== */
+.section-rack {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  padding: 35px 0 25px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.rack-heading-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rack-badge-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #111111;
+  padding: 6px 18px;
+  border: 1px solid #e5e5e5;
+  border-radius: 30px;
+  background: #ffffff;
+}
+
+.rack-badge-bold {
+  font-weight: 800;
+  color: #111111;
+}
+
+.rack-badge-divider {
+  color: #cccccc;
+}
+
+.rack-badge-light {
+  font-weight: 500;
+  color: #777777;
+}
+
+/* Interactive Rack Stage */
+.rack-stage {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+  perspective: 1200px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.rack-stage:active {
+  cursor: grabbing;
+}
+
+/* Thicker Parabolic Curved Rail / Cable Assembly (6.5px with cylindrical gradient) */
+.rack-wire-container {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  right: 0;
+  height: 90px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rack-wall-mount {
+  position: absolute;
+  top: 9px;
+  width: 36px;
+  height: 30px;
+  background: linear-gradient(180deg, #9CA3AF 0%, #6B7280 50%, #4B5563 100%);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+  z-index: 6;
+}
+
+.rack-wall-mount-left {
+  left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.rack-wall-mount-right {
+  right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.rack-wire-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Hangers Layer */
+.rack-hangers-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: transparent;
+}
+
+/* Individual Hanging Item: 58px wide at rest, expands to 220px when hovered */
+.rack-hanger-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 58px;
+  height: 232px;
+  margin-left: -29px;
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: 50% 0px;
+  will-change: transform, width, margin-left;
+  transition: z-index 0.1s linear;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.rack-hanger-item.is-hovered {
+  z-index: 50;
+}
+
+/* Crisp Off-White Rectangular Price Tag (52px x 36px, #F6F5F0) below rail */
+.rack-price-tag {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 36px;
+  background: #F6F5F0;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 50% -8px;
+  will-change: transform;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Small centered top eyelet hole */
+.rack-tag-eyelet {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: #2B2D31;
+  border: 1px solid #D1D5DB;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* Short string loop attached to the rail above */
+.rack-tag-string {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 11px;
+  background: #6B7280;
+  transition: background 0.2s ease;
+}
+
+.rack-tag-text {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.01em;
+  margin-top: 5px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.rack-hanger-item.is-hovered .rack-price-tag {
+  background: #111111;
+  border-color: #111111;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.26);
+}
+
+.rack-hanger-item.is-hovered .rack-tag-text {
+  color: #ffffff;
+}
+
+.rack-hanger-item.is-hovered .rack-tag-eyelet {
+  background: #ffffff;
+  border-color: #9CA3AF;
+}
+
+.rack-hanger-item.is-hovered .rack-tag-string {
+  background: #111111;
+}
+
+/* 3D Garment Container & Rotator (Hook apex wraps over wire rail with zero gap) */
+.rack-garment-wrapper {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 232px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  background: transparent;
+  pointer-events: none;
+}
+
+.rack-garment-rotator {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0px;
+  position: relative;
+  will-change: transform;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Garment Cutout Images: Edge-to-edge object-fit: contain */
+.rack-garment-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  mix-blend-mode: multiply;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.14));
+  will-change: opacity, transform, filter;
+}
+
+.rack-garment-side {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.15s ease-out;
+}
+
+.rack-garment-front {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.15s ease-out;
+}
+
+.rack-hanger-item.is-hovered .rack-garment-img {
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.22));
+}
+
+/* Footer / Bottom Bar */
+.rack-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 18px 50px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 20;
+  margin-top: 5px;
+  background: #ffffff;
+}
+
+.rack-footer-left {
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.rack-footer-rule {
+  width: 44px;
+  height: 1.5px;
+  background: #111111;
+  margin-bottom: 10px;
+}
+
+.rack-info-idle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #888888;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.rack-dot-sep {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  background: #888888;
+  border-radius: 50%;
+}
+
+.rack-info-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.rack-info-idle.is-hidden,
+.rack-info-active.is-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  position: absolute;
+  visibility: hidden;
+}
+
+.rack-active-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #111111;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.rack-active-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666666;
+  margin-top: 2px;
+}
+
+.rack-footer-right {
+  text-align: right;
+}
+
+.rack-editorial-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin-bottom: 5px;
+}
+
+.rack-cta-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111111;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+  display: inline-block;
+}
+
+.rack-cta-link:hover {
+  opacity: 0.6;
+}
+
+/* Quick Look Modal */
+.rack-modal {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 780px;
+  width: 90vw;
+  background: #ffffff;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.rack-modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.rack-modal-inner {
+  position: relative;
+  padding: 36px 40px;
+}
+
+.rack-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.rack-modal-close:hover {
+  background: #e5e5e5;
+}
+
+.rack-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.rack-modal-image-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 24px;
+  min-height: 340px;
+}
+
+.rack-modal-image-col img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
+}
+
+.rack-modal-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.rack-modal-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #888888;
+  margin-bottom: 8px;
+}
+
+.rack-modal-title {
+  font-size: 26px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: #111111;
+  margin: 0 0 6px;
+}
+
+.rack-modal-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 16px;
+}
+
+.rack-modal-desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #555555;
+  margin-bottom: 22px;
+}
+
+.rack-modal-size-row {
+  margin-bottom: 24px;
+}
+
+.rack-modal-size-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #777777;
+  margin-bottom: 8px;
+}
+
+.rack-size-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.rack-size-pill {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rack-size-pill:hover {
+  border-color: #111111;
+}
+
+.rack-size-pill.is-active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+.rack-modal-add-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.rack-modal-add-btn:hover {
+  background: #333333;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .rack-footer {
+    padding: 16px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .rack-footer-right {
+    text-align: left;
+  }
+  .rack-modal-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* ==========================================================================
+   NIKE ORBIT SECTION (3D CURVED SNEAKER CAROUSEL)
+   ========================================================================== */
+.section-orbit {
+  position: relative;
+  width: 100%;
+  min-height: 780px;
+  background: #ffffff;
+  padding: 60px 48px 80px;
+  overflow: hidden;
+  border-bottom: 1px solid #e5e5e5;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.orbit-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Left Column — Dynamic Active Product Details */
+.orbit-hero-meta {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.orbit-meta-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.orbit-meta-inner.is-sliding-out {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+.orbit-meta-inner.is-sliding-in {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.orbit-counter {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #888888;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.orbit-shoe-name {
+  font-size: clamp(36px, 4.2vw, 48px);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #111111;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 10px;
+  max-width: 380px;
+}
+
+.orbit-shoe-price {
+  font-size: 21px;
+  font-weight: 600;
+  color: #111111;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.orbit-view-details {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111111;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1.5px solid #111111;
+  padding-bottom: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.orbit-view-details:hover {
+  opacity: 0.65;
+  transform: translateX(2px);
+}
+
+.orbit-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.orbit-view-details:hover .orbit-arrow {
+  transform: translateX(3px);
+}
+
+/* Center-to-Right Curved Orbit — 3D Perspective Stage */
+.orbit-stage {
+  position: relative;
+  width: 100%;
+  height: 540px;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.orbit-stage:active {
+  cursor: grabbing;
+}
+
+/* Background Orbit Trajectory Guides */
+.orbit-curves-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.9;
+}
+
+/* Floating Shoes Group */
+.orbit-shoes-group {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Individual Shoe Item along 3D Perspective Arc */
+.orbit-shoe-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 300px;
+  transform-origin: center center;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform, opacity;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-shoe-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.18));
+  transition: filter 0.3s ease;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.orbit-shoe-shadow {
+  position: absolute;
+  bottom: 22px;
+  left: 12%;
+  width: 76%;
+  height: 24px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.1) 48%, transparent 72%);
+  border-radius: 50%;
+  filter: blur(8px);
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: center center;
+  transition: opacity 0.3s ease;
+}
+
+.orbit-shoe-item:hover .orbit-shoe-img {
+  filter: drop-shadow(0 32px 42px rgba(0, 0, 0, 0.28));
+}
+
+.orbit-shoe-item.is-hero .orbit-shoe-img {
+  filter: drop-shadow(0 28px 38px rgba(0, 0, 0, 0.22));
+}
+
+/* Bottom-Right — Size Selector Grid */
+.orbit-size-panel {
+  position: absolute;
+  right: 24px;
+  bottom: 120px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.orbit-size-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 50px);
+  gap: 8px;
+}
+
+.orbit-size-btn {
+  width: 50px;
+  height: 46px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-size-btn:hover {
+  border-color: #111111;
+  background: #fafafa;
+}
+
+.orbit-size-btn.is-selected {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+.orbit-add-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 13px 20px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 26px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.orbit-add-btn:hover {
+  background: #2b2b2b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.orbit-add-btn:active {
+  transform: translateY(0);
+}
+
+/* Bottom Interactive Control — "DRAG THE WHEEL" Scrubber */
+.orbit-jog-wheel-wrap {
+  position: relative;
+  margin: 10px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  width: 380px;
+  pointer-events: auto;
+}
+
+/* Mini Preview Thumbnail Floating Directly Above the Active Thumb */
+.orbit-scrub-thumb-preview {
+  position: relative;
+  width: 360px;
+  height: 48px;
+  pointer-events: none;
+}
+
+#orbit-thumb-img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 42px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 3px 6px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: transform 0.05s linear, opacity 0.2s ease;
+  will-change: left, transform;
+}
+
+/* Track & Thumb Indicator */
+.orbit-jog-indicator-track {
+  width: 340px;
+  height: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.orbit-jog-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: #111111;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+  transition: transform 0.05s linear;
+  will-change: left;
+}
+
+/* Metallic Dial / Scrubber */
+.orbit-jog-dial {
+  width: 350px;
+  height: 34px;
+  background: linear-gradient(
+    180deg,
+    #2a2c30 0%,
+    #4a4e54 8%,
+    #d1d5db 38%,
+    #ffffff 50%,
+    #cbd0d7 62%,
+    #3b3e44 92%,
+    #18191c 100%
+  );
+  border-radius: 17px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+  position: relative;
+  cursor: ew-resize;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.orbit-jog-dial:focus-visible {
+  box-shadow: 0 0 0 2px #111111, 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.orbit-jog-ribs {
+  position: absolute;
+  top: 0;
+  left: -200px;
+  width: 800px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.orbit-jog-rib {
+  width: 2px;
+  height: 60%;
+  background: rgba(0, 0, 0, 0.48);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.65);
+}
+
+.orbit-jog-legend {
+  display: flex;
+  justify-content: space-between;
+  width: 350px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #888888;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.orbit-legend-title {
+  color: #777777;
+}
+
+@media (max-width: 1024px) {
+  .section-orbit {
+    padding: 40px 24px 60px;
+  }
+  .orbit-shoe-item {
+    width: 380px;
+    height: 240px;
+  }
+  .orbit-size-panel {
+    right: 16px;
+    bottom: 110px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-orbit {
+    min-height: 860px;
+    padding: 30px 16px 50px;
+  }
+  .orbit-container {
+    min-height: 740px;
+  }
+  .orbit-hero-meta {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 20px;
+  }
+  .orbit-stage {
+    height: 380px;
+  }
+  .orbit-shoe-item {
+    width: 300px;
+    height: 190px;
+  }
+  .orbit-size-panel {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    align-items: center;
+    margin: 20px auto 10px;
+  }
+  .orbit-jog-wheel-wrap {
+    width: 100%;
+    max-width: 340px;
+  }
+  .orbit-jog-dial,
+  .orbit-jog-legend,
+  .orbit-jog-indicator-track,
+  .orbit-scrub-thumb-preview {
+    width: 310px;
+  }
+}
+
+/* Big "OBSESSED." Section Header */
+.brand-marquee {
+  width: 100%;
+  text-align: center;
+  padding: 40px 0 20px;
+  font-size: clamp(60px, 12vw, 140px);
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  color: #0c0c0c;
+  line-height: 0.9;
+  text-transform: uppercase;
+  user-select: none;
+}

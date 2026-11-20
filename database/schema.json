@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClothingAgencyFirestoreDatabase",
+  "description": "Firestore collection schemas for Clothing Agency E-Commerce",
+  "collections": {
+    "products": {
+      "type": "object",
+      "required": ["id", "title", "category", "price", "numericPrice", "sizes"],
+      "properties": {
+        "id": { "type": "string", "description": "Unique product slug (e.g. luka-5, rack-blazer-navy-1)" },
+        "title": { "type": "string", "description": "Display title of the product" },
+        "name": { "type": "string", "description": "Short name variant" },
+        "subtitle": { "type": "string", "description": "Editorial tagline or material spec" },
+        "category": { "type": "string", "enum": ["sneakers", "rack", "runway"] },
+        "price": { "type": "string", "description": "Formatted price (e.g. $149.00)" },
+        "numericPrice": { "type": "number", "description": "Raw numeric price for calculations" },
+        "image": { "type": "string", "description": "Primary cutout or product asset URL" },
+        "frontImage": { "type": "string", "description": "Front-facing garment cutout" },
+        "sideImage": { "type": "string", "description": "Side-profile resting garment cutout" },
+        "tag": { "type": "string", "description": "Price tag string (e.g. $199)" },
+        "desc": { "type": "string", "description": "Detailed editorial description" },
+        "sizes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available size inventory (e.g. ['40', '41', '42'] or ['S', 'M', 'L'])"
+        },
+        "in_stock": { "type": "boolean", "default": true }
+      }
+    },
+    "carts": {
+      "type": "object",
+      "required": ["session_id", "items", "subtotal"],
+      "properties": {
+        "session_id": { "type": "string", "description": "Anonymous session ID or member user_id" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["item_id", "product_id", "title", "size", "quantity", "price"],
+            "properties": {
+              "item_id": { "type": "string" },
+              "product_id": { "type": "string" },
+              "title": { "type": "string" },
+              "size": { "type": "string" },
+              "quantity": { "type": "integer", "minimum": 1 },
+              "price": { "type": "number" },
+              "image": { "type": "string" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "total_items": { "type": "integer" }
+      }
+    },
+    "orders": {
+      "type": "object",
+      "required": ["id", "customer_name", "customer_email", "items", "total", "status", "created_at"],
+      "properties": {
+        "id": { "type": "string", "description": "Unique Order ID (e.g. ORD-XXXXXX)" },
+        "customer_name": { "type": "string" },
+        "customer_email": { "type": "string", "format": "email" },
+        "shipping_address": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["product_id", "title", "size", "quantity", "price"],
+            "properties": {
+              "product_id": { "type": "string" },
+              "title": { "type": "string" },
+              "size": { "type": "string" },
+              "quantity": { "type": "integer" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "shipped", "delivered"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "users": {
+      "type": "object",
+      "required": ["user_id", "name", "email", "password_hash", "created_at"],
+      "properties": {
+        "user_id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "password_hash": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

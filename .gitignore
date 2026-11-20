@@ -1,0 +1,31 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Firebase / Google credentials — NEVER commit secrets
+serviceAccountKey.json
+firebase-adminsdk*.json
+google-credentials.json
+*-credentials.json
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Scratch / temp files
+scratch/
