@@ -228,6 +228,15 @@
       });
     }
 
+    // Global helper for search integration: focus a sneaker by index
+    window.focusSneakerOrbit = function (idx) {
+      const currentInt = Math.round(currentProgress);
+      const rawDiff = ((idx - currentInt) % N + N) % N;
+      const diff = rawDiff > N / 2 ? rawDiff - N : rawDiff;
+      targetProgress = currentInt + diff;
+      updateProductMeta(((idx % N) + N) % N);
+    };
+
     // Click on any shoe along the arc to orbit it directly to hero focus (shortest arc)
     shoeItems.forEach((item) => {
       const handleClick = () => {
@@ -814,6 +823,12 @@
       }
     }
 
+    // Global helper for search integration: open a rack product modal
+    window.openRackProduct = function (productId) {
+      const prod = RACK_PRODUCTS.find((p) => p.id === productId);
+      if (prod) openQuickLook(prod);
+    };
+
     function updateFooterInfo(prod) {
       if (infoIdle && infoActive && activeTitle && activePrice) {
         infoIdle.classList.add('is-hidden');
@@ -1037,6 +1052,315 @@
   }
 
   // --------------------------------------------------------------------------
+  // 5. FUZZY & RELEVANCE SCORING SEARCH ALGORITHM & UI
+  // --------------------------------------------------------------------------
+  function initSearch() {
+    const searchInput = document.getElementById('site-search-input');
+    const searchDropdown = document.getElementById('site-search-dropdown');
+    const searchClear = document.getElementById('site-search-clear');
+    const searchWrap = document.getElementById('site-search-wrap');
+
+    if (!searchInput || !searchDropdown) return;
+
+    // Comprehensive catalog aggregated from Sneaker Orbit, Clothing Rack, and Runway
+    const SEARCH_CATALOG = [
+      // Sneakers (Sneaker Orbit)
+      { id: 'luka-5', name: 'Luka 5', title: 'LUKA 5', category: 'Sneakers', price: '$149.00', numericPrice: 149, image: '/assets/sneakers/sneaker-1.webp', type: 'sneaker', shoeIndex: 0, desc: 'Jordan Brand Space Minimalist IsoPlate stability Cushlon 3.0' },
+      { id: 'tatum-5-orbit', name: 'Tatum 5 Orbit', title: 'TATUM 5 ORBIT', category: 'Sneakers', price: '$149.00', numericPrice: 149, image: '/assets/sneakers/sneaker-2.webp', type: 'sneaker', shoeIndex: 1, desc: 'Ultra-Lightweight Zoom Air performance collapsible heel' },
+      { id: 'air-jordan-12-retro', name: 'Air Jordan 12 Retro', title: 'AIR JORDAN 12 RETRO', category: 'Sneakers', price: '$149.00', numericPrice: 149, image: '/assets/sneakers/sneaker-3.webp', type: 'sneaker', shoeIndex: 2, desc: 'Heritage Court full-grain leather radiant stitching' },
+      { id: 'air-jordan-1-retro', name: 'Air Jordan 1 Retro', title: 'AIR JORDAN 1 RETRO', category: 'Sneakers', price: '$180.00', numericPrice: 180, image: '/assets/sneakers/sneaker-4.webp', type: 'sneaker', shoeIndex: 3, desc: 'High OG classic basketball street culture icon' },
+      { id: 'air-jordan-3-cement', name: 'Air Jordan 3 Cement', title: 'AIR JORDAN 3 CEMENT', category: 'Sneakers', price: '$210.00', numericPrice: 210, image: '/assets/sneakers/sneaker-5.webp', type: 'sneaker', shoeIndex: 4, desc: 'Elephant print cement grey visible air sole luxury' },
+      { id: 'nike-dunk-low', name: 'Nike Dunk Low Retro', title: 'NIKE DUNK LOW RETRO', category: 'Sneakers', price: '$115.00', numericPrice: 115, image: '/assets/sneakers/sneaker-6.webp', type: 'sneaker', shoeIndex: 5, desc: 'Low top padded collar vintage hardwood retro skate' },
+      { id: 'air-max-95-og', name: 'Air Max 95 OG', title: 'AIR MAX 95 OG', category: 'Sneakers', price: '$175.00', numericPrice: 175, image: '/assets/sneakers/sneaker-7.webp', type: 'sneaker', shoeIndex: 6, desc: 'Anatomy-inspired gradient panels dual visible Air units' },
+
+      // Apparel (Clothing Rack)
+      { id: 'blazer-navy', name: 'Tailored Navy Wool Blazer', title: 'Tailored Navy Wool Blazer', category: 'Jackets', price: '$199.00', numericPrice: 199, image: '/assets/hoodies/jacket-navy.png', type: 'rack', desc: 'Precision-tailored structured shoulder double-faced Italian wool' },
+      { id: 'hoodie-graphic', name: 'Graphic Archive Hoodie', title: 'Graphic Archive Hoodie', category: 'Hoodies', price: '$149.00', numericPrice: 149, image: '/assets/hoodies/hoodie-green.png', type: 'rack', desc: 'Vintage wash heavyweight 480GSM French terry distressed print' },
+      { id: 'hoodie-heavy', name: 'Heavyweight Core Hoodie', title: 'Heavyweight Core Hoodie', category: 'Hoodies', price: '$169.00', numericPrice: 169, image: '/assets/hoodies/hoodie-black.png', type: 'rack', desc: 'Oversized boxy drop-shoulder double-layered hood 500GSM fleece' },
+      { id: 'hoodie-fleece', name: 'Premium Fleece Pullover', title: 'Premium Fleece Pullover', category: 'Hoodies', price: '$159.00', numericPrice: 159, image: '/assets/hoodies/hoodie-cream.png', type: 'rack', desc: 'Minimalist relaxed silhouette ultra-soft brushed interior cream' },
+      { id: 'crew-minimal', name: 'Minimalist Heavy Crewneck', title: 'Minimalist Heavy Crewneck', category: 'Sweatshirts', price: '$139.00', numericPrice: 139, image: '/assets/hoodies/crewneck-black-side.png', type: 'rack', desc: 'Clean rib collar dropped shoulder relaxed street fit' },
+
+      // Runway Collection
+      { id: 'runway-tee', name: 'Runway Minimalist Tee', title: 'Runway Minimalist Tee', category: 'T-Shirts', price: '$55.00', numericPrice: 55, image: 'https://reel-ref-try-the-look.vercel.app/assets/source-tshirt.webp', type: 'runway', desc: 'Clean white tee relaxed fit combed cotton essentials' },
+      { id: 'runway-sweat', name: 'Runway Raglan Sweatshirt', title: 'Runway Raglan Sweatshirt', category: 'Sweatshirts', price: '$120.00', numericPrice: 120, image: 'https://reel-ref-try-the-look.vercel.app/assets/source-sweatshirt.webp', type: 'runway', desc: 'Burgundy layers tailored perspective raglan fleece' },
+      { id: 'runway-sweat-plus', name: 'Runway Oversized Sweatshirt Plus', title: 'Runway Oversized Sweatshirt Plus', category: 'Sweatshirts', price: '$135.00', numericPrice: 135, image: 'https://reel-ref-try-the-look.vercel.app/assets/source-sweatshirt-plus.webp', type: 'runway', desc: 'Olive knitwear grounded palette oversized comfort' }
+    ];
+
+    // Levenshtein distance for fuzzy typo tolerance
+    function levenshtein(a, b) {
+      if (a.length === 0) return b.length;
+      if (b.length === 0) return a.length;
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    // Relevance scoring search algorithm
+    function searchAlgorithm(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return [];
+
+      const tokens = q.split(/\s+/).filter(Boolean);
+      const scored = [];
+
+      SEARCH_CATALOG.forEach((item) => {
+        const name = (item.name || item.title || '').toLowerCase();
+        const cat = (item.category || '').toLowerCase();
+        const desc = (item.desc || '').toLowerCase();
+        const priceStr = String(item.numericPrice || item.price || '').toLowerCase();
+
+        let score = 0;
+
+        // 1. Exact full query matches
+        if (name === q) {
+          score += 200;
+        } else if (name.startsWith(q)) {
+          score += 120;
+        } else if (name.includes(q)) {
+          score += 80;
+        }
+
+        // 2. Token-by-token scoring
+        let matchedTokens = 0;
+        tokens.forEach((t) => {
+          if (name.includes(t)) {
+            score += 40;
+            matchedTokens++;
+          } else if (cat.includes(t)) {
+            score += 30;
+            matchedTokens++;
+          } else if (desc.includes(t)) {
+            score += 15;
+            matchedTokens++;
+          } else if (priceStr.includes(t)) {
+            score += 25;
+            matchedTokens++;
+          } else {
+            // Check fuzzy typo match against each word in the name
+            const words = name.split(/\s+/);
+            for (const w of words) {
+              if (t.length >= 3 && levenshtein(t, w) <= 1) {
+                score += 20;
+                matchedTokens++;
+                break;
+              }
+            }
+          }
+        });
+
+        // Bonus if all tokens in multi-word query matched somewhere
+        if (matchedTokens === tokens.length && tokens.length > 1) {
+          score += 30;
+        }
+
+        if (score > 0) {
+          scored.push({ item, score });
+        }
+      });
+
+      // Sort by score descending
+      scored.sort((a, b) => b.score - a.score);
+      return scored.map((s) => s.item);
+    }
+
+    let selectedIndex = -1;
+    let currentResults = [];
+
+    function renderResults(results, query) {
+      currentResults = results;
+      selectedIndex = -1;
+
+      if (!query.trim()) {
+        searchDropdown.style.display = 'none';
+        searchDropdown.innerHTML = '';
+        return;
+      }
+
+      if (results.length === 0) {
+        searchDropdown.innerHTML = `
+          <div class="search-empty-state">
+            <div style="font-weight: 700; color: #111; margin-bottom: 4px;">No products found</div>
+            <div>No results for "<strong>${escapeHtml(query)}</strong>". Try searching for "Jordan", "Hoodie", "Blazer", or "Sneakers".</div>
+          </div>
+        `;
+        searchDropdown.style.display = 'flex';
+        return;
+      }
+
+      const headerHtml = `
+        <div class="search-dropdown-header">
+          <span>Matching Products</span>
+          <span>${results.length} found</span>
+        </div>
+      `;
+
+      const itemsHtml = results
+        .map((item, idx) => {
+          return `
+          <div class="search-result-item" data-search-idx="${idx}">
+            <img class="search-result-thumb" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" />
+            <div class="search-result-info">
+              <div class="search-result-title">${escapeHtml(item.name)}</div>
+              <div class="search-result-meta">
+                <span class="search-result-badge">${escapeHtml(item.category)}</span>
+                <span class="search-result-price">${escapeHtml(item.price)}</span>
+              </div>
+            </div>
+            <button type="button" class="search-result-add" data-add-id="${escapeHtml(item.id)}" title="Add to Bag">+ Bag</button>
+          </div>
+        `;
+        })
+        .join('');
+
+      searchDropdown.innerHTML = headerHtml + itemsHtml;
+      searchDropdown.style.display = 'flex';
+
+      // Click row to navigate to product
+      searchDropdown.querySelectorAll('.search-result-item').forEach((row) => {
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('.search-result-add')) return; // handled separately
+          const idx = Number(row.dataset.searchIdx);
+          const item = results[idx];
+          if (item) navigateToProduct(item);
+        });
+      });
+
+      // Add to bag button inside search
+      searchDropdown.querySelectorAll('.search-result-add').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.addId;
+          const item = results.find((p) => p.id === id);
+          if (!item) return;
+
+          if (window.AtelierCart) {
+            window.AtelierCart.add({
+              id: item.id,
+              productId: item.id,
+              name: item.name,
+              price: item.numericPrice || 149,
+              size: 'M',
+              image: item.image,
+              quantity: 1
+            });
+          } else {
+            triggerBagToast(`${item.name} added to bag`);
+          }
+          btn.textContent = '✓ Added';
+          btn.style.background = '#166534';
+          setTimeout(() => {
+            btn.textContent = '+ Bag';
+            btn.style.background = '#111111';
+          }, 1500);
+        });
+      });
+    }
+
+    function navigateToProduct(item) {
+      searchDropdown.style.display = 'none';
+      if (item.type === 'sneaker') {
+        const orbitSec = document.getElementById('nike-orbit');
+        if (orbitSec) orbitSec.scrollIntoView({ behavior: 'smooth' });
+        if (typeof window.focusSneakerOrbit === 'function') {
+          setTimeout(() => window.focusSneakerOrbit(item.shoeIndex), 350);
+        }
+      } else if (item.type === 'rack') {
+        const railSec = document.getElementById('scene-rail');
+        if (railSec) railSec.scrollIntoView({ behavior: 'smooth' });
+        if (typeof window.openRackProduct === 'function') {
+          setTimeout(() => window.openRackProduct(item.id), 400);
+        }
+      } else if (item.type === 'runway') {
+        const runwaySec = document.getElementById('runway');
+        if (runwaySec) runwaySec.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Input typing event (Live search)
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value;
+      if (searchClear) searchClear.style.display = q ? 'block' : 'none';
+      const results = searchAlgorithm(q);
+      renderResults(results, q);
+    });
+
+    // Clear search
+    if (searchClear) {
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        searchClear.style.display = 'none';
+        searchDropdown.style.display = 'none';
+        searchInput.focus();
+      });
+    }
+
+    // Keyboard navigation (Arrow keys & Enter)
+    searchInput.addEventListener('keydown', (e) => {
+      if (searchDropdown.style.display === 'none') return;
+      const rows = searchDropdown.querySelectorAll('.search-result-item');
+      if (!rows.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % rows.length;
+        rows.forEach((r, i) => r.classList.toggle('is-selected', i === selectedIndex));
+        rows[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + rows.length) % rows.length;
+        rows.forEach((r, i) => r.classList.toggle('is-selected', i === selectedIndex));
+        rows[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const targetIdx = selectedIndex >= 0 ? selectedIndex : 0;
+        if (currentResults[targetIdx]) {
+          navigateToProduct(currentResults[targetIdx]);
+        }
+      } else if (e.key === 'Escape') {
+        searchDropdown.style.display = 'none';
+        searchInput.blur();
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (searchWrap && !searchWrap.contains(e.target)) {
+        searchDropdown.style.display = 'none';
+      }
+    });
+
+    // Reopen when clicking back into input if it has content
+    searchInput.addEventListener('focus', () => {
+      if (searchInput.value.trim()) {
+        const results = searchAlgorithm(searchInput.value);
+        renderResults(results, searchInput.value);
+      }
+    });
+  }
+
+  // --------------------------------------------------------------------------
   // 4. SMOOTH NAV LINK JUMPING
   // --------------------------------------------------------------------------
   function initNav() {
@@ -1062,10 +1386,12 @@
       initOrbit();
       initRail();
       initNav();
+      initSearch();
     });
   } else {
     initOrbit();
     initRail();
     initNav();
+    initSearch();
   }
 })();

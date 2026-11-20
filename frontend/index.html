@@ -29,12 +29,14 @@
         <a href="#runway">Runway</a>
       </nav>
       <div class="header-right">
-        <div class="search-pill">
+        <div class="search-pill" id="site-search-wrap" style="position: relative;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#707072" stroke-width="2" stroke-linecap="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" placeholder="Search" aria-label="Search products" />
+          <input type="text" id="site-search-input" placeholder="Search" aria-label="Search products" spellcheck="false" autocomplete="off" />
+          <button type="button" id="site-search-clear" style="display:none; background:none; border:none; padding:0 4px; cursor:pointer; color:#888; font-size:13px; line-height:1;" aria-label="Clear search">✕</button>
+          <div id="site-search-dropdown" class="search-dropdown-menu" style="display:none;"></div>
         </div>
         <div style="position: relative;">
           <a href="/login.html" class="header-icon-btn" id="header-account-btn" aria-label="Account Login" title="Account Login">
