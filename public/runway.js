@@ -11,37 +11,43 @@
         name: 'The City Edit',
         description: 'A charcoal knit and easy denim.',
         image: ASSET_BASE + 'original-look-1.webp',
-        products: ['tatum-5-orbit-copy', 'tshirt', 'sweatshirt']
+        products: ['tatum-5-orbit-copy', 'tshirt', 'sweatshirt'],
+        bgColor: '#F8D8D8'
       },
       {
         name: 'Gallery Opening',
         description: 'A clean white tee and relaxed denim.',
         image: ASSET_BASE + 'original-look-5.webp',
-        products: ['tatum-5-orbit', 'hoodie-black', 'tshirt']
+        products: ['tatum-5-orbit', 'hoodie-black', 'tshirt'],
+        bgColor: '#FBE8D3'
       },
       {
         name: 'Gallery Opening',
         description: 'Olive knitwear. A grounded palette.',
         image: ASSET_BASE + 'original-look-4.webp',
-        products: ['sweatshirt-plus', 'tatum-5-orbit', 'tshirt']
+        products: ['sweatshirt-plus', 'tatum-5-orbit', 'tshirt'],
+        bgColor: '#D3EAD8'
       },
       {
         name: 'Studio Day',
         description: 'Black, white and laid-back denim.',
         image: ASSET_BASE + 'original-look-6.webp',
-        products: ['hoodie-black', 'tatum-5-orbit-copy', 'tshirt']
+        products: ['hoodie-black', 'tatum-5-orbit-copy', 'tshirt'],
+        bgColor: '#EDE3D2'
       },
       {
         name: 'Studio Day',
         description: 'Burgundy layers. A tailored perspective.',
         image: ASSET_BASE + 'original-look-3.webp',
-        products: ['sweatshirt', 'tatum-5-orbit', 'tshirt']
+        products: ['sweatshirt', 'tatum-5-orbit', 'tshirt'],
+        bgColor: '#DFD9F5'
       },
       {
         name: 'Studio Day',
         description: 'A grey crew and your favourite denim.',
         image: ASSET_BASE + 'original-look-2.webp',
-        products: ['hoodie', 'air-jordan-12-retro-copy', 'tshirt']
+        products: ['hoodie', 'air-jordan-12-retro-copy', 'tshirt'],
+        bgColor: '#DCE8F5'
       }
     ],
     items: [
@@ -2142,6 +2148,17 @@
       const prev = this._index;
       this._index = i;
       this._kick();
+
+      // Apply look background colorway to body and wrappers
+      const look = NATIVE_CATALOG.looks[i];
+      if (look && look.bgColor) {
+        document.body.style.backgroundColor = look.bgColor;
+        document.documentElement.style.backgroundColor = look.bgColor;
+        const home = document.getElementById('home');
+        if (home) home.style.backgroundColor = look.bgColor;
+        const rwLeft = this.querySelector('.rw__left');
+        if (rwLeft) rwLeft.style.backgroundColor = look.bgColor;
+      }
 
       // Accessibility of queue bodies
       const maxK = this._mode === 'ring' ? 2 : 3;

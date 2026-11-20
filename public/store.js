@@ -15,49 +15,56 @@
       name: 'LUKA 5',
       price: '$149.00',
       numericPrice: 149,
-      image: '/assets/sneakers/sneaker-1.webp'
+      image: '/assets/sneakers/sneaker-1.webp',
+      bgColor: '#DCE8F5'
     },
     {
       id: 'tatum-5-orbit',
       name: 'TATUM 5 ORBIT',
       price: '$149.00',
       numericPrice: 149,
-      image: '/assets/sneakers/sneaker-2.webp'
+      image: '/assets/sneakers/sneaker-2.webp',
+      bgColor: '#FBE8D3'
     },
     {
       id: 'air-jordan-12-retro',
       name: 'AIR JORDAN 12 RETRO',
       price: '$149.00',
       numericPrice: 149,
-      image: '/assets/sneakers/sneaker-3.webp'
+      image: '/assets/sneakers/sneaker-3.webp',
+      bgColor: '#F8D8D8'
     },
     {
       id: 'air-jordan-1-retro',
       name: 'AIR JORDAN 1 RETRO',
       price: '$180.00',
       numericPrice: 180,
-      image: '/assets/sneakers/sneaker-4.webp'
+      image: '/assets/sneakers/sneaker-4.webp',
+      bgColor: '#EDE3D2'
     },
     {
       id: 'air-jordan-3-cement',
       name: 'AIR JORDAN 3 CEMENT',
       price: '$210.00',
       numericPrice: 210,
-      image: '/assets/sneakers/sneaker-5.webp'
+      image: '/assets/sneakers/sneaker-5.webp',
+      bgColor: '#DFD9F5'
     },
     {
       id: 'nike-dunk-low',
       name: 'NIKE DUNK LOW RETRO',
       price: '$115.00',
       numericPrice: 115,
-      image: '/assets/sneakers/sneaker-6.webp'
+      image: '/assets/sneakers/sneaker-6.webp',
+      bgColor: '#D3EAD8'
     },
     {
       id: 'air-max-95-og',
       name: 'AIR MAX 95 OG',
       price: '$175.00',
       numericPrice: 175,
-      image: '/assets/sneakers/sneaker-7.webp'
+      image: '/assets/sneakers/sneaker-7.webp',
+      bgColor: '#E8F4B8'
     }
   ];
 
@@ -151,10 +158,20 @@
     }));
 
     function updateProductMeta(idx) {
-      if (idx === displayedIndex) return;
-      displayedIndex = idx;
       const shoe = SNEAKERS[idx];
       if (!shoe) return;
+
+      if (shoe.bgColor) {
+        document.body.style.backgroundColor = shoe.bgColor;
+        document.documentElement.style.backgroundColor = shoe.bgColor;
+        const orbitSection = document.getElementById('nike-orbit');
+        if (orbitSection) orbitSection.style.backgroundColor = shoe.bgColor;
+        const homeMain = document.getElementById('home');
+        if (homeMain) homeMain.style.backgroundColor = shoe.bgColor;
+      }
+
+      if (idx === displayedIndex) return;
+      displayedIndex = idx;
 
       if (thumbImg) {
         thumbImg.src = shoe.image;
@@ -218,6 +235,7 @@
         const rawDiff = ((item.index - currentInt) % N + N) % N;
         const diff = rawDiff > N / 2 ? rawDiff - N : rawDiff;
         targetProgress = currentInt + diff;
+        updateProductMeta(((item.index % N) + N) % N);
       };
 
       item.el.addEventListener('click', handleClick);
@@ -259,6 +277,8 @@
       // Add velocity inertia on release and magnetically snap to nearest integer index (infinite)
       const inertiaShift = -dragVelocity * 0.08;
       targetProgress = Math.round(targetProgress + inertiaShift);
+      const snapIdx = ((Math.round(targetProgress) % N) + N) % N;
+      updateProductMeta(snapIdx);
     }
 
     // Dial Drag Listener
@@ -301,10 +321,14 @@
       if (Math.abs(delta) > 10) {
         e.preventDefault();
         targetProgress += (delta > 0 ? 0.35 : -0.35);
+        const approxIdx = ((Math.round(targetProgress) % N) + N) % N;
+        updateProductMeta(approxIdx);
 
         clearTimeout(wheelSnapTimer);
         wheelSnapTimer = setTimeout(() => {
           targetProgress = Math.round(targetProgress);
+          const finalIdx = ((Math.round(targetProgress) % N) + N) % N;
+          updateProductMeta(finalIdx);
         }, 120);
       }
     }, { passive: false });
@@ -314,8 +338,12 @@
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         targetProgress = Math.round(targetProgress) + 1;
+        const nextIdx = ((Math.round(targetProgress) % N) + N) % N;
+        updateProductMeta(nextIdx);
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         targetProgress = Math.round(targetProgress) - 1;
+        const prevIdx = ((Math.round(targetProgress) % N) + N) % N;
+        updateProductMeta(prevIdx);
       }
     });
 
