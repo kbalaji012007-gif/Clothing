@@ -53,18 +53,14 @@ main,
 }
 
 .main-nav a:hover,
+.main-nav a:focus,
 .main-nav a.is-active {
   color: #000000;
+  text-decoration: none;
 }
 
 .main-nav a.is-active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #000000;
+  display: none;
 }
 
 .header-right {
