@@ -23,22 +23,6 @@
 
 ---
 
-## 🔐 Verified Access Credentials
-
-### 1. Master Administrator Portal
-- **Login URL:** [https://clothing-two-lime.vercel.app/admin/login.html](https://clothing-two-lime.vercel.app/admin/login.html)
-- **Email:** `admin@atelier.luxury`
-- **Password:** `Admin@Atelier2026`
-- **Permissions:** Full control over catalog pricing, inventory, customer accounts, and payment reconciliation.
-
-### 2. Verified Member / Customer Account
-- **Login URL:** [https://clothing-two-lime.vercel.app/account/login.html](https://clothing-two-lime.vercel.app/account/login.html)
-- **Email:** `alice@atelier.luxury`
-- **Password:** `Member@Atelier2026`
-- **Permissions:** Member pricing, styling bag persistence, order placement, and shipment tracking.
-
----
-
 ## ✨ Key Architectural Highlights
 
 ### 1. Real-Time Price Synchronization & Anti-Tampering Engine
