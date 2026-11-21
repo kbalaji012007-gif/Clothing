@@ -70,7 +70,7 @@
         <div style="text-align: center; margin-bottom: 16px;">
           <a href="/" style="font-size: 14px; font-weight: 800; letter-spacing: 2px;">ATELIER LUXURY</a>
         </div>
-        <h1 class="auth-title">Customer Sign In</h1>
+        <h1 class="auth-title">Sign In</h1>
 
         <div id="alert-box" class="auth-alert"></div>
 
@@ -126,8 +126,14 @@
         const submitBtn = document.getElementById('submit-btn');
 
         // Check if already logged in
-        if (AccountApp.getToken() && AccountApp.getUser()) {
-          window.location.href = '/account/dashboard.html';
+        const currentToken = AccountApp.getToken() || localStorage.getItem('atelier_admin_token');
+        const currentUser = AccountApp.getUser() || (localStorage.getItem('atelier_admin_user') ? JSON.parse(localStorage.getItem('atelier_admin_user')) : null);
+        if (currentToken && currentUser) {
+          if (currentUser.role === 'ADMIN') {
+            window.location.href = '/admin/dashboard.html';
+          } else {
+            window.location.href = '/account/dashboard.html';
+          }
           return;
         }
 
@@ -168,7 +174,30 @@
               role: data.role
             });
 
-            // If pending checkout, redirect back to shop
+            // Master Administrator routing
+            if (data.role === 'ADMIN') {
+              localStorage.setItem('atelier_admin_token', data.token);
+              localStorage.setItem('atelier_admin_user', JSON.stringify({
+                user_id: data.user_id,
+                name: data.name,
+                email: data.email,
+                role: data.role
+              }));
+
+              alertBox.textContent = `Welcome Master Administrator, ${data.name}! Opening Admin HQ...`;
+              alertBox.className = 'auth-alert';
+              alertBox.style.display = 'block';
+              alertBox.style.background = '#dcfce7';
+              alertBox.style.color = '#166534';
+              alertBox.style.border = '1px solid #bbf7d0';
+
+              setTimeout(() => {
+                window.location.href = '/admin/dashboard.html';
+              }, 400);
+              return;
+            }
+
+            // Customer routing
             if (sessionStorage.getItem('pending_checkout') === 'true') {
               sessionStorage.removeItem('pending_checkout');
               window.location.href = '/?checkout=true';
@@ -221,6 +250,28 @@
                 email: data.email,
                 role: data.role
               });
+
+              if (data.role === 'ADMIN') {
+                localStorage.setItem('atelier_admin_token', data.token);
+                localStorage.setItem('atelier_admin_user', JSON.stringify({
+                  user_id: data.user_id,
+                  name: data.name,
+                  email: data.email,
+                  role: data.role
+                }));
+
+                alertBox.textContent = `Welcome Master Administrator, ${data.name}! Opening Admin HQ...`;
+                alertBox.className = 'auth-alert';
+                alertBox.style.display = 'block';
+                alertBox.style.background = '#dcfce7';
+                alertBox.style.color = '#166534';
+                alertBox.style.border = '1px solid #bbf7d0';
+
+                setTimeout(() => {
+                  window.location.href = '/admin/dashboard.html';
+                }, 400);
+                return;
+              }
 
               alertBox.textContent = `Welcome, ${data.name}! Signed in successfully.`;
               alertBox.className = 'auth-alert';

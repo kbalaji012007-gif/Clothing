@@ -28,7 +28,7 @@ const AdminApp = {
   logout() {
     localStorage.removeItem('atelier_admin_token');
     localStorage.removeItem('atelier_admin_user');
-    window.location.href = '/admin/login.html';
+    window.location.href = '/account/login.html';
   },
 
   requireAdmin() {
@@ -36,7 +36,7 @@ const AdminApp = {
     const user = this.getUser();
 
     if (!token || !user) {
-      window.location.href = '/admin/login.html';
+      window.location.href = '/account/login.html';
       return false;
     }
 
