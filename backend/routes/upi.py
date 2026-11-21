@@ -1,3 +1,4 @@
+import os
 import re
 import uuid
 import urllib.parse
@@ -10,8 +11,8 @@ from ..config import logger
 
 router = APIRouter(prefix="/upi", tags=["UPI Gateway"])
 
-DEFAULT_PAYEE_VPA = "atelier@upi"
-DEFAULT_PAYEE_NAME = "Atelier Collection"
+DEFAULT_PAYEE_VPA = os.getenv("UPI_PAYEE_VPA", "atelier@upi")
+DEFAULT_PAYEE_NAME = os.getenv("UPI_PAYEE_NAME", "Atelier Collection")
 USD_TO_INR_RATE = 86.50
 
 class UpiCreateIntentRequest(BaseModel):
@@ -55,10 +56,13 @@ def create_upi_intent(payload: UpiCreateIntentRequest):
     amount_inr = round(payload.amountUsd, 2) if is_inr else round(payload.amountUsd * USD_TO_INR_RATE, 2)
     amount_str = f"{amount_inr:.2f}"
     
+    payee_vpa = os.getenv("UPI_PAYEE_VPA", DEFAULT_PAYEE_VPA)
+    payee_name = os.getenv("UPI_PAYEE_NAME", DEFAULT_PAYEE_NAME)
+
     # Canonical upi://pay parameters
     params = {
-        "pa": DEFAULT_PAYEE_VPA,
-        "pn": DEFAULT_PAYEE_NAME,
+        "pa": payee_vpa,
+        "pn": payee_name,
         "am": amount_str,
         "cu": "INR",
         "tn": f"Atelier Order {payload.orderId}"
@@ -81,8 +85,8 @@ def create_upi_intent(payload: UpiCreateIntentRequest):
         "amountUsd": payload.amountUsd,
         "amountInr": amount_inr,
         "formattedInr": f"₹{amount_inr:,.2f}",
-        "payeeVpa": DEFAULT_PAYEE_VPA,
-        "payeeName": DEFAULT_PAYEE_NAME,
+        "payeeVpa": payee_vpa,
+        "payeeName": payee_name,
         "upiUri": upi_uri,
         "qrImageUrl": qr_image_url,
         "providers": [

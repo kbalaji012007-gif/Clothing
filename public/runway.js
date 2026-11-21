@@ -826,9 +826,18 @@
             if (vpaEl) vpaEl.textContent = upiData.payeeVpa || 'atelier@upi';
 
             if (upiData.providers) {
-              if (gpayEl && upiData.providers.gpay) gpayEl.href = upiData.providers.gpay.launchUrl;
-              if (phonepeEl && upiData.providers.phonepe) phonepeEl.href = upiData.providers.phonepe.launchUrl;
-              if (paytmEl && upiData.providers.paytm) paytmEl.href = upiData.providers.paytm.launchUrl;
+              if (Array.isArray(upiData.providers)) {
+                const gpay = upiData.providers.find(p => p.id === 'gpay');
+                const phonepe = upiData.providers.find(p => p.id === 'phonepe');
+                const paytm = upiData.providers.find(p => p.id === 'paytm');
+                if (gpayEl && gpay) gpayEl.href = gpay.uri;
+                if (phonepeEl && phonepe) phonepeEl.href = phonepe.uri;
+                if (paytmEl && paytm) paytmEl.href = paytm.uri;
+              } else {
+                if (gpayEl && upiData.providers.gpay) gpayEl.href = upiData.providers.gpay.launchUrl || upiData.providers.gpay.uri;
+                if (phonepeEl && upiData.providers.phonepe) phonepeEl.href = upiData.providers.phonepe.launchUrl || upiData.providers.phonepe.uri;
+                if (paytmEl && upiData.providers.paytm) paytmEl.href = upiData.providers.paytm.launchUrl || upiData.providers.paytm.uri;
+              }
             }
           } catch (err) {
             // Local fallback intent
