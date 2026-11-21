@@ -15,8 +15,8 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
-        value: admin@atelier.luxury
+        value: kbalaji@gmail.com
       - key: ADMIN_INITIAL_PASSWORD
-        value: Admin@Atelier2026
+        value: balaji@123
       - key: FIREBASE_CREDENTIALS_JSON
         sync: false

@@ -16,8 +16,8 @@ JWT_SECRET = os.getenv("JWT_SECRET", "atelier_couture_luxury_jwt_secret_key_2026
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES", "10080")) # 7 days
 ADMIN_BOOTSTRAP_KEY = os.getenv("ADMIN_BOOTSTRAP_KEY", "atelier-bootstrap-2026")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@atelier.luxury")
-ADMIN_INITIAL_PASSWORD = os.getenv("ADMIN_INITIAL_PASSWORD", "Admin@Atelier2026")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "kbalaji@gmail.com")
+ADMIN_INITIAL_PASSWORD = os.getenv("ADMIN_INITIAL_PASSWORD", "balaji@123")
 
 # Clean import from the decoupled database layer
 from database.connection import get_firestore_client, is_firebase_connected, init_firebase
