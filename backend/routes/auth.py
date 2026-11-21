@@ -36,6 +36,12 @@ class BootstrapAdminRequest(BaseModel):
     password: str
     bootstrap_key: Optional[str] = None
 
+class GoogleAuthRequest(BaseModel):
+    credential: Optional[str] = None
+    email: Optional[str] = None
+    name: Optional[str] = None
+    picture: Optional[str] = None
+
 class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
@@ -148,6 +154,64 @@ def login(payload: LoginRequest):
         email=email_clean,
         role=role,
         message="Signed in successfully."
+    )
+
+@router.post("/google", response_model=AuthResponse)
+def google_auth(payload: GoogleAuthRequest):
+    """
+    Authenticate or register customer via Google Sign-In.
+    """
+    email = payload.email.strip().lower() if payload.email else ""
+    name = (payload.name or "Atelier Member").strip()
+
+    if payload.credential:
+        try:
+            import jwt
+            decoded = jwt.decode(payload.credential, options={"verify_signature": False})
+            email = decoded.get("email", email).strip().lower()
+            name = decoded.get("name", name).strip()
+        except Exception as e:
+            logger.warning(f"Error parsing Google credential JWT: {e}")
+
+    if not email or "@" not in email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A valid Google email address is required."
+        )
+
+    user = FirestoreService.get_user_by_email(email)
+    if not user:
+        user_id = f"usr_{uuid.uuid4().hex[:8]}"
+        new_user = {
+            "user_id": user_id,
+            "name": name,
+            "email": email,
+            "role": "CUSTOMER",
+            "addresses": [],
+            "wishlist": [],
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        FirestoreService.create_user(new_user)
+        user = new_user
+    else:
+        user_id = user.get("user_id", f"usr_{uuid.uuid4().hex[:8]}")
+        name = user.get("name") or name
+
+    role = user.get("role", "CUSTOMER")
+    token = create_access_token({
+        "sub": user_id,
+        "email": email,
+        "role": role,
+        "name": name
+    })
+
+    return AuthResponse(
+        token=token,
+        user_id=user_id,
+        name=name,
+        email=email,
+        role=role,
+        message=f"Welcome, {name}! Signed in with Google."
     )
 
 @router.post("/admin-login", response_model=AuthResponse)
