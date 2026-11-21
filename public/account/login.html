@@ -116,6 +116,9 @@
       </div>
     </div>
 
+    <!-- Firebase App & Auth SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="/account/account.js"></script>
     <script>
       (function() {
@@ -127,6 +130,19 @@
         if (AccountApp.getToken() && AccountApp.getUser()) {
           window.location.href = '/account/dashboard.html';
           return;
+        }
+
+        // Initialize Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBxlX53QOQD0byVDXG0ZJKNOQdeGNOscaE",
+          authDomain: "clothing-agency-atelier.firebaseapp.com",
+          projectId: "clothing-agency-atelier",
+          storageBucket: "clothing-agency-atelier.firebasestorage.app",
+          messagingSenderId: "1044697519233",
+          appId: "1:1044697519233:web:8b42d886bf65056722a980"
+        };
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
         }
 
         form.addEventListener('submit', async (e) => {
@@ -168,29 +184,35 @@
           }
         });
 
-        // Google Authentication
+        // Google Authentication via Firebase Popup
         const googleBtn = document.getElementById('google-signin-btn');
         if (googleBtn) {
           googleBtn.addEventListener('click', async () => {
             alertBox.className = 'auth-alert';
             alertBox.style.display = 'none';
 
-            let googleEmail = document.getElementById('email').value.trim();
-            if (!googleEmail || !googleEmail.includes('@')) {
-              const entered = prompt('Please enter your Google Email address:', 'patron@gmail.com');
-              if (!entered) return;
-              googleEmail = entered.trim();
-            }
-
             googleBtn.disabled = true;
             googleBtn.innerHTML = '<span>Connecting to Google...</span>';
 
             try {
+              if (typeof firebase === 'undefined' || !firebase.auth) {
+                throw new Error('Firebase authentication library could not be loaded.');
+              }
+
+              const provider = new firebase.auth.GoogleAuthProvider();
+              provider.setCustomParameters({ prompt: 'select_account' });
+              const result = await firebase.auth().signInWithPopup(provider);
+              const user = result.user;
+              const idToken = await user.getIdToken();
+
+              googleBtn.innerHTML = '<span>Authenticating session...</span>';
+
               const data = await AccountApp.apiRequest('/auth/google', {
                 method: 'POST',
                 body: JSON.stringify({
-                  email: googleEmail,
-                  name: googleEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                  email: user.email,
+                  name: user.displayName || user.email.split('@')[0],
+                  credential: idToken
                 })
               });
 
@@ -217,8 +239,17 @@
                 }
               }, 600);
             } catch (err) {
-              alertBox.textContent = err.message || 'Google sign-in failed.';
-              alertBox.className = 'auth-alert error';
+              if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                alertBox.style.display = 'none';
+              } else if (err.code === 'auth/unauthorized-domain') {
+                alertBox.textContent = 'Domain not authorized in Firebase Console yet. Please ensure clothing-two-lime.vercel.app is added under Authorized Domains.';
+                alertBox.className = 'auth-alert error';
+                alertBox.style.display = 'block';
+              } else {
+                alertBox.textContent = err.message || 'Google sign-in failed. Please try again.';
+                alertBox.className = 'auth-alert error';
+                alertBox.style.display = 'block';
+              }
               googleBtn.disabled = false;
               googleBtn.innerHTML = `
                 <svg width="18" height="18" viewBox="0 0 24 24">
